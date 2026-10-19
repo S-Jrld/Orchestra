@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Orchestra Validator
-# Checks link integrity, file existence, and token footprints.
+# Checks link integrity, file existence, agent modes, and token footprints.
 # ==============================================================================
 set -euo pipefail
 
@@ -27,6 +27,11 @@ REQUIRED_FILES=(
     "templates/ADR_TEMPLATE.md"
     "templates/EXECUTION_BRIEF.md"
     "templates/VERIFICATION_REPORT.md"
+    "agents/orchestra.md"
+    "agents/researcher.md"
+    "agents/advisor.md"
+    "agents/tester.md"
+    "agents/reviewer.md"
     "scripts/install.sh"
 )
 
@@ -41,7 +46,28 @@ for f in "${REQUIRED_FILES[@]}"; do
 done
 
 echo ""
-echo "=== 2. Validating Relative Links in Markdown Files ==="
+echo "=== 2. Validating Agent Modes ==="
+# orchestra.md must be mode: primary
+if grep -q "^mode: primary" "$ROOT_DIR/agents/orchestra.md"; then
+    echo "✓ agents/orchestra.md is configured as mode: primary (single entry point)"
+else
+    echo "❌ agents/orchestra.md must be configured as mode: primary"
+    ERRORS=$((ERRORS + 1))
+fi
+
+# specialist agents must be mode: subagent
+for subagent in "researcher" "advisor" "tester" "reviewer"; do
+    file="$ROOT_DIR/agents/$subagent.md"
+    if grep -q "^mode: subagent" "$file"; then
+        echo "✓ agents/$subagent.md is configured as mode: subagent (hidden specialist)"
+    else
+        echo "❌ agents/$subagent.md must be configured as mode: subagent"
+        ERRORS=$((ERRORS + 1))
+    fi
+done
+
+echo ""
+echo "=== 3. Validating Relative Links in Markdown Files ==="
 while IFS= read -r md_file; do
     dir=$(dirname "$md_file")
     # Match markdown links: [text](path)
@@ -60,11 +86,10 @@ while IFS= read -r md_file; do
 done < <(find "$ROOT_DIR" -name "*.md" -not -path "*/.git/*")
 
 echo ""
-echo "=== 3. Token Footprint & Line Counts ==="
+echo "=== 4. Token Footprint & Line Counts ==="
 for check_file in "AGENTS.md" "ORCHESTRATOR.md"; do
     lines=$(wc -l < "$ROOT_DIR/$check_file")
     words=$(wc -w < "$ROOT_DIR/$check_file")
-    # rough approximation: 1 token ~ 0.75 words -> tokens ~ words * 1.33
     tokens=$((words * 4 / 3))
     echo "  $check_file: $lines lines, $words words (~$tokens tokens)"
     if [ "$lines" -gt 90 ]; then
@@ -74,7 +99,7 @@ done
 
 echo ""
 if [ "$ERRORS" -eq 0 ]; then
-    echo "✅ ALL CHECKS PASSED: Orchestra structure, Caveman integration, and links are 100% valid."
+    echo "✅ ALL CHECKS PASSED: Orchestra structure, single-agent suite, and links are 100% valid."
     exit 0
 else
     echo "❌ VALIDATION FAILED: $ERRORS errors found."
