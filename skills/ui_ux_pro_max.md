@@ -11,9 +11,12 @@
 
 ## Install
 ```bash
-npx ui-ux-pro-max-cli init --ai opencode
+npx ui-ux-pro-max-cli init --ai opencode            # project: .opencode/skills/
+npx ui-ux-pro-max-cli init --ai opencode -g         # global: ~/
 ```
-Installs to `.opencode/skills/ui-ux-pro-max/SKILL.md` with the search script at `.opencode/skills/ui-ux-pro-max/scripts/search.py`.
+The CLI bundles 7 skills: `ui-ux-pro-max`, `ui-styling`, `design-system`, `design`, `brand`, `banner-design`, `slides`.
+For OpenCode, copy them into the global skill root `~/.config/opencode/skills/<name>/` (that is the path OpenCode reads; a `-g` install lands in `~/.opencode/skills/` instead).
+Search script path: `~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py` (~4.5 MB payload, CSVs plus Python search engine).
 Missing Python 3? Stop and ask the user to install it. Never run `sudo`, `brew`, `apt`, or `winget` for this skill.
 
 ## Query Contract
@@ -28,19 +31,19 @@ Empty or off-topic result: retry once with a narrower rewrite or explicit domain
 ## Execution
 ```bash
 # 1. Design system (new projects / pages)
-python3 .opencode/skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system -p "Project Name"
+python3 ~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py "<product_type> <industry> <keywords>" --design-system -p "Project Name"
 
 # 1b. Persist for cross-session retrieval (Master + per-page overrides)
-python3 .opencode/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --output-dir "<project-root>"
+python3 ~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --persist -p "Project Name" --output-dir "<project-root>"
 
 # 1c. Design dials (1-10, optional)
-python3 .opencode/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --variance 8 --motion 7 --density 8 -p "Ops Console"
+python3 ~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system --variance 8 --motion 7 --density 8 -p "Ops Console"
 
 # 2. Domain detail
-python3 .opencode/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
+python3 ~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --domain <domain> [-n <max_results>]
 
 # 3. Stack guidelines
-python3 .opencode/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack <stack>
+python3 ~/.config/opencode/skills/ui-ux-pro-max/scripts/search.py "<keyword>" --stack <stack>
 ```
 
 ## Search Reference
