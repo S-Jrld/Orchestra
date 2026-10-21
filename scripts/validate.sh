@@ -19,6 +19,7 @@ REQUIRED_FILES=(
     "skills/caveman.md"
     "skills/superpowers.md"
     "skills/impeccable.md"
+    "skills/ui_ux_pro_max.md"
     "skills/graphify.md"
     "skills/understand_anything.md"
     "skills/archify.md"

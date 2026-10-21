@@ -187,6 +187,7 @@ Orchestra routes tasks between ambient session voices and domain-specialized ski
 | **Caveman** | Ambient (Session) | Token saving, terse voice, zero fluff | [`skills/caveman.md`](skills/caveman.md) |
 | **Superpowers** | Task-Level | Feature, bugfix, plan execution, TDD | [`skills/superpowers.md`](skills/superpowers.md) |
 | **Impeccable** | Task-Level | UI components, design polish, a11y, responsive styling | [`skills/impeccable.md`](skills/impeccable.md) |
+| **UI/UX Pro Max** | Task-Level | Design systems, palettes, style & font pairing, chart choice | [`skills/ui_ux_pro_max.md`](skills/ui_ux_pro_max.md) |
 | **Graphify** | Task-Level | Structural graphs, dependency clusters, god nodes | [`skills/graphify.md`](skills/graphify.md) |
 | **Understand Anything** | Task-Level | Codebase onboarding, visual interactive tours | [`skills/understand_anything.md`](skills/understand_anything.md) |
 | **Archify** | Task-Level | Architecture diagrams, C4 models, Mermaid specs | [`skills/archify.md`](skills/archify.md) |
@@ -216,6 +217,7 @@ Orchestra/
 │   ├── caveman.md                     # Token saving ambient voice engine
 │   ├── superpowers.md                 # TDD & structured execution adapter
 │   ├── impeccable.md                   # Frontend craft & UX adapter
+│   ├── ui_ux_pro_max.md                # Design intelligence & palette adapter
 │   ├── graphify.md                    # Knowledge graph adapter
 │   ├── understand_anything.md         # Visual onboarding adapter
 │   ├── archify.md                     # System diagramming adapter
