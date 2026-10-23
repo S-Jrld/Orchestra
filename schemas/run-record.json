@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/run-record.json",
+  "title": "OrchestraRunRecord",
+  "description": "Structured run record for audit logging and observability.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "workflow_id",
+    "tier",
+    "status",
+    "adapter",
+    "created_at",
+    "step_records"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "run_id": { "type": "string" },
+    "workflow_id": { "type": "string" },
+    "task_description": { "type": "string" },
+    "tier": {
+      "type": "string",
+      "enum": ["Tiny", "Normal", "Complex", "Architectural"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "succeeded", "failed", "cancelled"]
+    },
+    "adapter": { "type": "string" },
+    "model": { "type": "string" },
+    "selected_skills": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "created_at": { "type": "string" },
+    "completed_at": { "type": "string" },
+    "step_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_id", "status", "agent_role"],
+        "additionalProperties": false,
+        "properties": {
+          "step_id": { "type": "string" },
+          "name": { "type": "string" },
+          "agent_role": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "ready", "running", "waiting_approval", "succeeded", "failed", "cancelled", "skipped"]
+          },
+          "start_time": { "type": "string" },
+          "end_time": { "type": "string" },
+          "retry_count": { "type": "integer", "default": 0 },
+          "token_usage": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "input_tokens": { "type": "integer" },
+              "output_tokens": { "type": "integer" }
+            }
+          },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    "total_token_usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens": { "type": "integer", "minimum": 0 },
+        "output_tokens": { "type": "integer", "minimum": 0 },
+        "total_tokens": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "estimated_cost_usd": { "type": "number", "minimum": 0.0 }
+  }
+}

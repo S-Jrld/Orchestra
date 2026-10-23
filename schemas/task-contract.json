@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/task-contract.json",
+  "title": "OrchestraTaskContract",
+  "description": "Standard contract for dispatched subagent tasks (Execution Brief).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "task_id",
+    "objective",
+    "agent_role",
+    "scope",
+    "acceptance_criteria",
+    "verification_command"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "parent_run_id": {
+      "type": "string"
+    },
+    "step_id": {
+      "type": "string"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 5
+    },
+    "agent_role": {
+      "type": "string",
+      "enum": ["orchestra", "researcher", "advisor", "tester", "reviewer", "worker"]
+    },
+    "scope": {
+      "type": "object",
+      "required": ["allowed_paths"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "forbidden_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "max_modified_files": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10
+        }
+      }
+    },
+    "selected_skills": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "input_artifacts": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "verification_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "budget_allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_calls": { "type": "integer", "minimum": 1 },
+        "max_tokens": { "type": "integer", "minimum": 100 },
+        "timeout_seconds": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "stop_condition": {
+      "type": "string"
+    }
+  }
+}

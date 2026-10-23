@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/execution-policy.json",
+  "title": "OrchestraExecutionPolicy",
+  "description": "Security, runtime sandbox, and tool approval policies.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "allowed_workspace_roots",
+    "approval_gates"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "allowed_workspace_roots": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "forbidden_path_patterns": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [
+        "**/.git/**",
+        "**/.env*",
+        "**/id_rsa*",
+        "**/credentials*",
+        "/etc/**",
+        "/root/**"
+      ]
+    },
+    "approval_gates": {
+      "type": "object",
+      "required": ["destructive_file_ops", "external_network", "secret_access"],
+      "additionalProperties": false,
+      "properties": {
+        "destructive_file_ops": { "type": "boolean", "default": true },
+        "external_network": { "type": "boolean", "default": true },
+        "secret_access": { "type": "boolean", "default": true },
+        "arbitrary_shell": { "type": "boolean", "default": true }
+      }
+    },
+    "secret_redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "max_parallel_workers": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8,
+      "default": 4
+    }
+  }
+}

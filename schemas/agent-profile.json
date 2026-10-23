@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/agent-profile.json",
+  "title": "OrchestraAgentProfile",
+  "description": "Canonical definition of an Orchestra agent or specialist subagent profile.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "role",
+    "mode",
+    "description",
+    "capabilities",
+    "permissions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["primary", "subagent"]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10
+    },
+    "color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "resource", "effect"],
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["read", "write", "edit", "glob", "grep", "shell", "subagent", "skill", "network"]
+          },
+          "resource": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string",
+            "enum": ["allow", "deny"]
+          }
+        }
+      }
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "denied_tools": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "model_preferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preferred_tier": {
+          "type": "string",
+          "enum": ["fast", "balanced", "reasoning", "local"]
+        },
+        "temperature": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "fallback_models": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_steps": { "type": "integer", "minimum": 1, "default": 10 },
+        "timeout_seconds": { "type": "integer", "minimum": 1, "default": 300 },
+        "max_tokens_per_turn": { "type": "integer", "minimum": 100 }
+      }
+    }
+  }
+}

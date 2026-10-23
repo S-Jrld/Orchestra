@@ -9,3 +9,16 @@ Thumbs.db
 # Temp
 *.tmp
 *.swp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local execution runs
+.orchestra/runs/*.json
+.orchestra/audit.jsonl
+.orchestra/*.db
+.orchestra/*.db-journal
+!.orchestra/.gitkeep

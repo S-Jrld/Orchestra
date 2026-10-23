@@ -199,38 +199,86 @@ Orchestra routes tasks between ambient session voices and domain-specialized ski
 
 ```text
 Orchestra/
+├── bin/
+│   └── orch                           # Orchestra CLI executable launcher
+├── orchestra/                         # Core Python 3 Runtime (zero external dependencies)
+│   ├── registry/                      # Skill discovery, deterministic scoring, conflict resolution
+│   ├── context/                       # Progressive L0/L1/L2 context builder & SHA-256 cache
+│   ├── workflow/                      # Declarative DAG execution engine & step scheduler
+│   ├── budget/                        # Hard quota enforcement & tier profile manager
+│   ├── security/                      # Path sandbox allowlist & secret redactor
+│   ├── adapters/                      # Client adapters (Mock, OpenCode, Antigravity)
+│   ├── models.py                      # Strongly typed dataclasses
+│   └── validator.py                   # Draft 2020-12 pure-Python JSON schema validator
+├── schemas/                           # Canonical Draft 2020-12 JSON schemas
+│   ├── skill-manifest.json
+│   ├── agent-profile.json
+│   ├── workflow-definition.json
+│   ├── task-contract.json
+│   ├── structured-result.json
+│   └── run-record.json
+├── spec/                              # Formal vendor-neutral specifications
+├── docs/                              # Full technical architecture & guides
+├── workflows/                         # Declarative DAG workflow definitions
+├── tests/                             # Automated test suite (unit, integration, adapters, benchmarks)
 ├── AGENTS.md                          # L0 Constitutional Kernel + Caveman (Tokens: ~500)
 ├── ORCHESTRATOR.md                    # L1 Task & Skill Router (Tokens: ~400)
 ├── README.md                          # Full guide and architecture overview
 ├── LICENSE                            # MIT License
-├── agents/
-│   ├── orchestra.md                   # Single primary agent (mode: primary)
-│   ├── researcher.md                  # Codebase discovery subagent (mode: subagent)
-│   ├── advisor.md                     # Architecture & contracts subagent (mode: subagent)
-│   ├── tester.md                      # TDD test-runner subagent (mode: subagent)
-│   └── reviewer.md                    # Threat & quality audit subagent (mode: subagent)
-├── protocols/
-│   ├── TOKEN_ECONOMY.md               # Context tiering & Caveman integration
-│   ├── ENGINEERING_STANDARDS.md       # TDD cycles & verification gates
-│   └── SUBAGENT_DISPATCH.md           # Scoped subagent dispatch schema
-├── skills/
-│   ├── caveman.md                     # Token saving ambient voice engine
-│   ├── superpowers.md                 # TDD & structured execution adapter
-│   ├── impeccable.md                   # Frontend craft & UX adapter
-│   ├── ui_ux_pro_max.md                # Design intelligence & palette adapter
-│   ├── graphify.md                    # Knowledge graph adapter
-│   ├── understand_anything.md         # Visual onboarding adapter
-│   ├── archify.md                     # System diagramming adapter
-│   └── addy_osmani.md                 # Performance optimization adapter
-├── templates/
-│   ├── ACTIVE_TASK.md                 # Compact active state tracker
-│   ├── ADR_TEMPLATE.md                # Lightweight architectural decision record
-│   ├── EXECUTION_BRIEF.md             # Subagent task handoff contract
-│   └── VERIFICATION_REPORT.md         # Empirical test evidence format
+├── agents/                            # Agent profiles (orchestra, researcher, advisor, tester, reviewer)
+├── protocols/                         # Engineering, Token Economy & Dispatch Protocols
+├── skills/                            # Portable skills (SKILL.md + manifest.json)
+├── templates/                         # State tracking, ADR & Verification templates
 └── scripts/
-    ├── install.sh                     # Zero-config deployment script
-    └── validate.sh                    # Link integrity, agent modes & token benchmark checker
+    ├── install.sh                     # Reversible deployment script with --dry-run
+    └── validate.sh                    # Integrity, agent modes & token benchmark checker
 ```
+
+---
+
+## 🛠️ Orchestra CLI (`orch`)
+
+Orchestra includes an executable CLI (`bin/orch`) for deterministic routing, workflow execution, adapter diagnostics, and benchmarking:
+
+```bash
+# Check system and adapter health
+orch doctor
+
+# Inspect and search discovered skills
+orch skills list
+orch skills inspect superpowers
+
+# Explain deterministic routing for a task
+orch route --task "Add JWT refresh endpoint in auth/router.py" --explain
+
+# Validate and run declarative DAG workflows
+orch workflow validate workflows/feature-tdd.json
+orch workflow run workflows/feature-tdd.json
+
+# Run token-efficiency benchmarks
+orch benchmark
+```
+
+---
+
+## 📚 Complete Documentation
+
+- [Architecture Overview](docs/architecture.md)
+- [Implementation Baseline & Audit](docs/implementation-baseline.md)
+- [Canonical Specification & Schemas](docs/specification.md)
+- [Skill Registry & Discovery](docs/skill-registry.md)
+- [Deterministic Routing Pipeline](docs/routing.md)
+- [Declarative Workflows](docs/workflows.md)
+- [Context Economy & Token Density](docs/context-economy.md)
+- [Budget & Cost Controls](docs/budget-management.md)
+- [Security & Trust Boundaries](docs/security-model.md)
+- [Client Adapters Architecture](docs/adapters.md)
+- [OpenCode Integration Guide](docs/opencode.md)
+- [Antigravity CLI Integration Guide](docs/antigravity-cli.md)
+- [Installation & Rollback](docs/installation.md)
+- [Troubleshooting & Error Codes](docs/troubleshooting.md)
+- [Benchmarking Results](docs/benchmarking.md)
+- [Development Roadmap](docs/roadmap.md)
 
 ---
 

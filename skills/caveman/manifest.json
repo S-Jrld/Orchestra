@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "id": "caveman",
+  "name": "Caveman Token Economy Engine",
+  "version": "3.1.0",
+  "kind": "session-ambient",
+  "summary": "Session-level token reduction engine cutting conversational fluff while preserving verbatim code.",
+  "source": {
+    "repo": "https://github.com/S-Jrld/Orchestra",
+    "revision": "v3.1.0",
+    "license": "MIT"
+  },
+  "triggers": {
+    "intents": [
+      "terse mode",
+      "less tokens",
+      "concise",
+      "caveman",
+      "token economy"
+    ],
+    "keywords": [
+      "caveman",
+      "terse",
+      "tokens",
+      "brief",
+      "compression"
+    ],
+    "command_triggers": [
+      "/caveman",
+      "/ultracave",
+      "/megacave"
+    ]
+  },
+  "capabilities": [
+    "token_compression",
+    "ambient_voice",
+    "ceremony_stripping"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Ambient",
+    "estimated_tokens": 700,
+    "requires_network": false,
+    "requires_shell": false
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

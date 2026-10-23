@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "id": "addy_osmani",
+  "name": "Addy Osmani Performance Patterns",
+  "version": "0.6.13",
+  "kind": "task-leaf",
+  "summary": "Web performance optimization patterns, bundle reduction, runtime efficiency, and Core Web Vitals.",
+  "source": {
+    "repo": "https://github.com/addyosmani/agent-skills.git",
+    "revision": "aeac41d",
+    "license": "MIT",
+    "upstream_author": "Addy Osmani"
+  },
+  "triggers": {
+    "intents": [
+      "performance optimization",
+      "bundle size",
+      "core web vitals",
+      "latency reduction",
+      "memory leak",
+      "slow page"
+    ],
+    "keywords": [
+      "performance",
+      "bundle",
+      "latency",
+      "vitals",
+      "speed",
+      "optimization",
+      "profiling"
+    ],
+    "command_triggers": [
+      "/addy-osmani"
+    ]
+  },
+  "capabilities": [
+    "performance_profiling",
+    "bundle_optimization",
+    "vitals_tuning"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 800,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": false,
+    "requires_approval": false
+  }
+}

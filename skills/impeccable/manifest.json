@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "id": "impeccable",
+  "name": "Impeccable UI Craft",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "Frontend craft and styling engine enforcing accessibility, 4 UI states, and responsive layout polish.",
+  "source": {
+    "repo": "https://github.com/pbakaus/impeccable.git",
+    "revision": "0665bd8",
+    "license": "MIT",
+    "upstream_author": "Paul Bakaus"
+  },
+  "triggers": {
+    "intents": [
+      "ui component",
+      "layout",
+      "styling",
+      "css polish",
+      "frontend craft",
+      "accessibility"
+    ],
+    "keywords": [
+      "ui",
+      "css",
+      "component",
+      "style",
+      "accessibility",
+      "responsive",
+      "layout"
+    ],
+    "command_triggers": [
+      "/impeccable"
+    ]
+  },
+  "capabilities": [
+    "ui_styling",
+    "accessibility_audit",
+    "responsive_layout"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 750,
+    "requires_network": false,
+    "requires_shell": false
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": false,
+    "requires_approval": false
+  }
+}

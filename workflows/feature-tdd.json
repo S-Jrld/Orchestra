@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "id": "feature-tdd",
+  "version": "1.0.0",
+  "name": "Feature Development TDD Workflow",
+  "description": "Standard TDD workflow coordinating researcher, advisor, tester, and reviewer subagents.",
+  "tier": "Normal",
+  "budget_profile": "Normal",
+  "steps": [
+    {
+      "id": "explore",
+      "name": "Explore codebase context and signatures",
+      "agent_role": "researcher",
+      "required_skills": ["understand_anything"],
+      "dependencies": [],
+      "target_files": ["src/auth.py"],
+      "verification_command": "true"
+    },
+    {
+      "id": "design_spec",
+      "name": "Design interface contract and schema",
+      "agent_role": "advisor",
+      "dependencies": ["explore"],
+      "verification_command": "true"
+    },
+    {
+      "id": "test_red",
+      "name": "Write automated failing test",
+      "agent_role": "tester",
+      "required_skills": ["superpowers"],
+      "dependencies": ["design_spec"],
+      "target_files": ["tests/test_auth.py"],
+      "verification_command": "true"
+    },
+    {
+      "id": "implement_green",
+      "name": "Implement minimal solution",
+      "agent_role": "orchestra",
+      "required_skills": ["superpowers"],
+      "dependencies": ["test_red"],
+      "target_files": ["src/auth.py"],
+      "verification_command": "true"
+    },
+    {
+      "id": "audit_diff",
+      "name": "Security and scope audit",
+      "agent_role": "reviewer",
+      "dependencies": ["implement_green"],
+      "verification_command": "true"
+    }
+  ],
+  "acceptance_criteria": [
+    "Interface spec approved",
+    "Failing test written and confirmed",
+    "Implementation passing all tests",
+    "Security review completed with clean verdict"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "id": "archify",
+  "name": "Archify System Diagrams",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "Architectural modeling, C4 model generation, and syntax-safe Mermaid and SVG diagramming.",
+  "source": {
+    "repo": "https://github.com/tt-a1i/archify.git",
+    "revision": "ba701d2",
+    "license": "MIT",
+    "upstream_author": "tt-a1i"
+  },
+  "triggers": {
+    "intents": [
+      "architecture diagram",
+      "mermaid",
+      "c4 model",
+      "sequence diagram",
+      "er diagram",
+      "system design"
+    ],
+    "keywords": [
+      "diagram",
+      "mermaid",
+      "c4",
+      "architecture",
+      "flowchart",
+      "topology",
+      "sequence"
+    ],
+    "command_triggers": [
+      "/archify"
+    ]
+  },
+  "capabilities": [
+    "mermaid_generation",
+    "architecture_modeling",
+    "c4_diagramming"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 750,
+    "requires_network": false,
+    "requires_shell": false
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

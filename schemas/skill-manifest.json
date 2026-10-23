@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/skill-manifest.json",
+  "title": "OrchestraSkillManifest",
+  "description": "Canonical manifest definition for an Orchestra portable skill.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "version",
+    "kind",
+    "summary",
+    "triggers",
+    "capabilities"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["session-ambient", "task-leaf", "composite"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 500
+    },
+    "source": {
+      "type": "object",
+      "required": ["repo", "revision", "license"],
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string" },
+        "revision": { "type": "string" },
+        "license": { "type": "string" },
+        "upstream_author": { "type": "string" }
+      }
+    },
+    "triggers": {
+      "type": "object",
+      "required": ["intents", "keywords"],
+      "additionalProperties": false,
+      "properties": {
+        "intents": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "file_patterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "command_triggers": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "conflicts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instruction_file": { "type": "string", "default": "SKILL.md" },
+        "references": { "type": "array", "items": { "type": "string" } },
+        "scripts": { "type": "array", "items": { "type": "string" } },
+        "templates": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "opencode": { "type": "boolean", "default": true },
+        "antigravity": { "type": "boolean", "default": true },
+        "min_python": { "type": "string" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tier": {
+          "type": "string",
+          "enum": ["Ambient", "Tiny", "Normal", "Complex", "Architectural"]
+        },
+        "estimated_tokens": { "type": "integer", "minimum": 0 },
+        "requires_network": { "type": "boolean", "default": false },
+        "requires_shell": { "type": "boolean", "default": false }
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "default": "low"
+        },
+        "read_only": { "type": "boolean", "default": false },
+        "requires_approval": { "type": "boolean", "default": false }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verification_suite": { "type": "string" },
+        "benchmark_fixture": { "type": "string" }
+      }
+    }
+  }
+}
