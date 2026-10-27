@@ -87,8 +87,72 @@ class TestWorkflowEngine(unittest.TestCase):
         engine = WorkflowEngine(wf, adapter, self.state_mgr, b_mgr, self.sec)
 
         with self.assertRaises(RuntimeError) as ctx:
-            engine.run()
+            engine.run(run_id="run_retry_test")
         self.assertIn("failed after 2 attempts", str(ctx.exception))
+
+        # Verify escalation notice created
+        escalation_notice = self.root / ".orchestra" / "escalations" / "run_retry_test_failing_step_escalation.md"
+        self.assertTrue(escalation_notice.is_file())
+        self.assertIn("DELEGATION ESCALATION NOTICE", escalation_notice.read_text())
+
+    def test_closed_loop_remediation_success(self):
+        steps = [
+            WorkflowStep(
+                id="remediation_step",
+                name="Remediation Step",
+                agent_role="tester",
+                dependencies=[],
+                retry_limit=2,
+            ),
+        ]
+        wf = WorkflowDefinition(
+            schema_version="1.0.0",
+            id="test-remediation",
+            version="1.0.0",
+            name="Remediation Test",
+            description="Testing closed-loop remediation",
+            tier=Tier.TINY,
+            steps=steps,
+            acceptance_criteria=[],
+        )
+
+        # Adapter that fails once then succeeds after observing failure reason
+        class RemediationAdapter(MockAdapter):
+            def __init__(self):
+                super().__init__()
+                self.calls = 0
+                self.observed_failure_reason = None
+
+            def invoke_step(self, step, contract, context):
+                self.calls += 1
+                if self.calls == 1:
+                    raise RuntimeError("Syntax error in test file")
+                # On retry, verify remediation contract artifacts were injected
+                self.observed_failure_reason = contract.input_artifacts.get("last_failure_reason")
+                self.delegation_status = contract.input_artifacts.get("delegation_status")
+                return StructuredResult(
+                    schema_version="1.0.0",
+                    task_id=contract.task_id,
+                    step_id=step.id,
+                    agent_role=step.agent_role,
+                    status="succeeded",
+                    summary="Resolved on retry",
+                    changed_files=[],
+                    verification_evidence="Test suite passed on remediation",
+                )
+
+        adapter = RemediationAdapter()
+        profile = BudgetProfileManager.get_profile(Tier.TINY.value)
+        b_mgr = BudgetManager(profile)
+
+        engine = WorkflowEngine(wf, adapter, self.state_mgr, b_mgr, self.sec)
+        record = engine.run(run_id="run_remediation_test")
+
+        self.assertEqual(record.status, RunStatus.SUCCEEDED)
+        self.assertEqual(adapter.calls, 2)
+        self.assertIn("Syntax error in test file", adapter.observed_failure_reason)
+        self.assertEqual(adapter.delegation_status, "remediation")
+        self.assertEqual(record.step_records[0].retry_count, 1)
 
 
 if __name__ == "__main__":

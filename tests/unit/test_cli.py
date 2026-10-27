@@ -75,6 +75,19 @@ class TestCLI(unittest.TestCase):
             finally:
                 os.chdir(orig_cwd)
 
+    def test_cli_learn(self):
+        with patch("sys.stdout", new=io.StringIO()) as fake_out:
+            code = self.cli.run(["learn"])
+            self.assertEqual(code, 0)
+            self.assertIn("AI Delegation Loop Insights", fake_out.getvalue())
+
+    def test_cli_learn_json(self):
+        with patch("sys.stdout", new=io.StringIO()) as fake_out:
+            code = self.cli.run(["learn", "--json"])
+            self.assertEqual(code, 0)
+            self.assertIn('"delegation_metrics"', fake_out.getvalue())
+            self.assertIn('"rule_suggestions"', fake_out.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

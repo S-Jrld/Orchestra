@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from orchestra.adapters.base import ClientAdapter
@@ -107,7 +108,7 @@ class WorkflowEngine:
         for target_file in step.target_files:
             self.security_engine.validate_file_access(target_file, action="write")
 
-        # 3. Create task contract
+        # 3. Create initial task contract
         contract = TaskContract(
             schema_version="1.0.0",
             task_id=f"{run_id}_{step.id}",
@@ -122,13 +123,37 @@ class WorkflowEngine:
             input_artifacts={k: v for k, v in (context_items or {}).items()},
         )
 
-        # 4. Invoke step via adapter with retries
+        # 4. Invoke step via adapter with closed-loop automated remediation
         retries = 0
         last_error = ""
 
         while retries <= step.retry_limit:
+            # Active step execution context
+            step_context = dict(context_items or {})
+
+            if retries > 0:
+                # Close the AI delegation loop: feed failure evidence directly into contract
+                contract.input_artifacts["delegation_status"] = "remediation"
+                contract.input_artifacts["last_failure_reason"] = last_error
+                contract.input_artifacts["remediation_attempt"] = f"Attempt {retries + 1} of {step.retry_limit + 1}"
+                contract.input_artifacts["remediation_guidance"] = (
+                    f"Previous attempt failed verification: {last_error}. "
+                    "Analyze failure output, identify root cause, and apply minimal fix within target scope."
+                )
+                step_context.update({
+                    "last_failure_reason": last_error,
+                    "remediation_attempt": str(retries + 1),
+                })
+                self.state_manager.update_step(
+                    run_id,
+                    step.id,
+                    StepStatus.RUNNING,
+                    retry_count=retries,
+                    error_message=f"Remediating retry {retries}: {last_error[:120]}",
+                )
+
             try:
-                result = self.adapter.invoke_step(step, contract, context_items or {})
+                result = self.adapter.invoke_step(step, contract, step_context)
 
                 # Record usage
                 in_tok = result.token_usage.get("input_tokens", 400)
@@ -150,6 +175,7 @@ class WorkflowEngine:
                     step.id,
                     StepStatus.SUCCEEDED,
                     token_usage={"input_tokens": in_tok, "output_tokens": out_tok, "total_tokens": in_tok + out_tok},
+                    retry_count=retries,
                 )
                 return
 
@@ -162,8 +188,47 @@ class WorkflowEngine:
                         step.id,
                         StepStatus.FAILED,
                         error_message=last_error,
+                        retry_count=retries,
                     )
-                    raise RuntimeError(f"Step '{step.id}' failed after {retries} attempts: {last_error}")
+                    self._record_escalation(run_id, step, last_error, retries)
+                    raise RuntimeError(
+                        f"Delegation loop for step '{step.id}' failed after {retries} attempts: {last_error}"
+                    )
+
+    def _record_escalation(
+        self,
+        run_id: str,
+        step: WorkflowStep,
+        last_error: str,
+        attempts: int,
+    ) -> None:
+        """Records an escalation notice when automated delegation retries are exhausted."""
+        workspace_root = getattr(self.state_manager, "root", Path("."))
+        escalation_dir = Path(workspace_root) / ".orchestra" / "escalations"
+        try:
+            escalation_dir.mkdir(parents=True, exist_ok=True)
+            notice_file = escalation_dir / f"{run_id}_{step.id}_escalation.md"
+            notice_content = f"""# ⚠️ DELEGATION ESCALATION NOTICE
+
+- **Run ID**: `{run_id}`
+- **Failed Step**: `{step.id}` ({step.name})
+- **Agent Role**: `{step.agent_role}`
+- **Attempts Exhausted**: {attempts}
+- **Stop Reason**: Delegation loop automated remediation limit reached without passing verification.
+
+## Failure Trace
+```text
+{last_error}
+```
+
+## Recommended Human Diligence Actions
+1. Review target files: `{', '.join(step.target_files) if step.target_files else 'None'}`.
+2. Check verification command: `{step.verification_command or 'None'}`.
+3. If this requires architectural changes or new dependencies, escalate tier to **Complex** or **Architectural** and create an ADR in `DECISIONS.md`.
+"""
+            notice_file.write_text(notice_content, encoding="utf-8")
+        except Exception:
+            pass
 
     def _evaluate_final_acceptance(
         self,

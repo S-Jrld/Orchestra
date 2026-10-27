@@ -139,6 +139,19 @@ class OrchestraCLI:
         # benchmark
         subparsers.add_parser("benchmark", parents=[base_parser], help="Run token-efficiency benchmarks")
 
+        # learn
+        learn_p = subparsers.add_parser(
+            "learn",
+            parents=[base_parser],
+            help="Analyze delegation loop patterns and suggest protocol/rule refinements",
+        )
+        learn_p.add_argument(
+            "--min-occurrences",
+            type=int,
+            default=1,
+            help="Minimum occurrences to generate rule suggestion",
+        )
+
         args = parser.parse_args(argv)
         if not args.subcommand:
             parser.print_help()
@@ -565,6 +578,54 @@ class OrchestraCLI:
             return 0
         print(f"Error: Unsupported uninstall target '{target}'.", file=sys.stderr)
         return 1
+
+    def cmd_learn(self, args: argparse.Namespace) -> int:
+        if not self.state_manager.analytics_db:
+            print("Error: Analytics database is not configured.", file=sys.stderr)
+            return 1
+
+        min_occ = getattr(args, "min_occurrences", 1)
+        metrics = self.state_manager.analytics_db.get_delegation_metrics()
+        suggestions = self.state_manager.analytics_db.suggest_rule_improvements(min_occurrences=min_occ)
+
+        payload = {
+            "delegation_metrics": metrics,
+            "rule_suggestions": suggestions,
+        }
+
+        if args.json:
+            self._output(payload, args)
+            return 0
+
+        print("=== 🎻 Orchestra AI Delegation Loop Insights ===")
+        print(f"Total Dispatched Steps:    {metrics['total_dispatched_steps']}")
+        print(f"First-Pass Success:        {metrics['first_pass_success']} ({metrics['first_pass_rate_percent']}%)")
+        print(f"Remediated by Loop:        {metrics['remediated_success']}")
+        print(f"Failed / Escalated:        {metrics['failed_steps']}")
+        print(f"Total Retries Performed:   {metrics['total_retries']}")
+        print(f"Loop Repair Efficiency:    {metrics['remediation_efficiency_percent']}%")
+
+        if metrics["roles"]:
+            print("\n--- Role-Level Delegation Performance ---")
+            for role, data in metrics["roles"].items():
+                print(
+                    f"  @{role:<12} Steps: {data['total_steps']:<3} | "
+                    f"First-Pass: {data['first_pass']:<3} | "
+                    f"Remediated: {data['remediated']:<3} | "
+                    f"Failed: {data['failed']:<3} | "
+                    f"Retries: {data['total_retries']}"
+                )
+
+        print("\n=== 💡 Compounding Feedback & Rule Suggestions ===")
+        if not suggestions:
+            print("  ✓ Zero recurring failure patterns detected. Delegation loops are running cleanly.")
+        else:
+            for idx, sugg in enumerate(suggestions, 1):
+                print(f"\n[{idx}] @{sugg['role']} - {sugg['category']}")
+                print(f"    Impact:         {sugg['impact']}")
+                print(f"    Recommendation: {sugg['recommendation']}")
+
+        return 0
 
     def cmd_validate(self, args: argparse.Namespace) -> int:
         # Run repository validation

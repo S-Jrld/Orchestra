@@ -109,6 +109,62 @@ class TestRunAnalytics(unittest.TestCase):
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0]["run_id"], "run_reindex_test")
 
+    def test_delegation_metrics_and_rule_suggestions(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            db_path = Path(tmp_dir) / "analytics.db"
+            analytics = RunAnalyticsDB(db_path)
+
+            step_pass = StepRunRecord(
+                step_id="step_clean",
+                name="Clean Step",
+                agent_role="researcher",
+                status=StepStatus.SUCCEEDED,
+                retry_count=0,
+            )
+            step_remediated = StepRunRecord(
+                step_id="step_remed",
+                name="Remediated Step",
+                agent_role="tester",
+                status=StepStatus.SUCCEEDED,
+                retry_count=1,
+            )
+            step_failed = StepRunRecord(
+                step_id="step_fail",
+                name="Failing Step",
+                agent_role="tester",
+                status=StepStatus.FAILED,
+                retry_count=2,
+                error_message="Verification failed with exit code 1",
+            )
+
+            run = RunRecord(
+                schema_version="1.0.0",
+                run_id="run_delegation_test",
+                workflow_id="wf_delegation",
+                tier="Normal",
+                status=RunStatus.FAILED,
+                adapter="mock",
+                created_at="2026-10-23T10:00:00+00:00",
+                step_records=[step_pass, step_remediated, step_failed],
+            )
+            analytics.index_run(run)
+
+            # Check delegation metrics
+            metrics = analytics.get_delegation_metrics()
+            self.assertEqual(metrics["total_dispatched_steps"], 3)
+            self.assertEqual(metrics["first_pass_success"], 1)
+            self.assertEqual(metrics["remediated_success"], 1)
+            self.assertEqual(metrics["failed_steps"], 1)
+            self.assertEqual(metrics["total_retries"], 3)
+            self.assertEqual(metrics["remediation_efficiency_percent"], 50.0)
+
+            # Check rule suggestions
+            suggestions = analytics.suggest_rule_improvements(min_occurrences=1)
+            self.assertEqual(len(suggestions), 1)
+            self.assertEqual(suggestions[0]["role"], "tester")
+            self.assertEqual(suggestions[0]["category"], "Verification Failure")
+            self.assertIn("ENGINEERING_STANDARDS.md", suggestions[0]["recommendation"])
+
 
 if __name__ == "__main__":
     unittest.main()

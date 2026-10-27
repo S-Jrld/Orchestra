@@ -149,11 +149,13 @@ class RunStateManager:
         status: StepStatus,
         token_usage: Optional[Dict[str, int]] = None,
         error_message: Optional[str] = None,
+        retry_count: Optional[int] = None,
     ) -> None:
         run = self.load_run(run_id)
         if not run:
             return
 
+        updated_retry = 0
         for s in run.step_records:
             if s.step_id == step_id:
                 s.status = status
@@ -170,10 +172,17 @@ class RunStateManager:
 
                 if error_message:
                     s.error_message = error_message
+                if retry_count is not None:
+                    s.retry_count = retry_count
+                updated_retry = s.retry_count
                 break
 
         self.save_run(run)
-        self._append_audit("step_updated", run_id, {"step_id": step_id, "status": status.value})
+        self._append_audit(
+            "step_updated",
+            run_id,
+            {"step_id": step_id, "status": status.value, "retry_count": updated_retry},
+        )
 
     def complete_run(self, run_id: str, status: RunStatus) -> None:
         run = self.load_run(run_id)

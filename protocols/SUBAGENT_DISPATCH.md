@@ -51,3 +51,25 @@ When delegating a task to any subagent, the prompt MUST strictly adhere to this 
 1. **Orchestrator Holds Authority**: The orchestrator reviews each subagent's output against the brief before accepting.
 2. **Reviewer Has Veto**: If the Reviewer reports a security vulnerability or scope creep, the Worker must rectify the diff before returning to user.
 3. **Escalation to User**: If specialists disagree on design trade-offs, halt execution and present the options directly to the user with an ADR recommendation.
+
+## 5. Closed-Loop Delegation Lifecycle
+
+Orchestra enforces an acyclic 4-phase delegation loop that eliminates infinite subagent recursion and guarantees verified execution:
+
+```mermaid
+flowchart LR
+    D["1. Dispatch<br/>(TaskContract)"] --> E["2. Leaf Exec<br/>(Denied Child-Spawning)"]
+    E --> V{"3. Verification Gate<br/>(Bash / Test)"}
+    V -->|"Pass"| S["4a. Deliver<br/>(StructuredResult)"]
+    V -->|"Fail & Retries Left"| R["4b. Remediate<br/>(Failure Trace Injected)"]
+    R --> E
+    V -->|"Fail & Retries Exhausted"| H["4c. Escalate<br/>(Human Diligence & ADR)"]
+```
+
+1. **Brief Dispatch (Orchestrator &rarr; Specialist)**: Orchestrator issues a scoped `TaskContract` with bounded file targets, token limits, and an objective.
+2. **Leaf Execution**: Specialist agents operate with `action: subagent -> deny`. They cannot spawn or re-delegate tasks, preventing infinite loops.
+3. **Deterministic Verification Gate**: `WorkflowVerifier` runs the command on disk. The agent is never permitted to self-certify.
+4. **Remediation & Compounding Learning**:
+   * **Remediation**: Upon failure, stdout/stderr is injected into `contract.input_artifacts["last_failure_reason"]` for targeted repair.
+   * **Escalation**: On exhausted retries, an escalation notice is emitted to `.orchestra/escalations/` for human review.
+   * **Compounding Rules**: Historical patterns in SQLite analytics are audited via `orch learn` to refine engineering standards over time.

@@ -18,6 +18,7 @@ __pycache__/
 
 # Local execution runs
 .orchestra/runs/*.json
+.orchestra/escalations/*.md
 .orchestra/audit.jsonl
 .orchestra/*.db
 .orchestra/*.db-journal

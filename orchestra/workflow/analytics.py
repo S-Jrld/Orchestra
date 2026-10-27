@@ -309,3 +309,125 @@ class RunAnalyticsDB:
                 "tiers": tiers,
                 "agent_roles": roles,
             }
+
+    def get_delegation_metrics(self) -> Dict[str, Any]:
+        """Calculates detailed metrics on the AI delegation loop across all steps."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_steps,
+                    SUM(CASE WHEN status = 'succeeded' AND retry_count = 0 THEN 1 ELSE 0 END) as first_pass_success,
+                    SUM(CASE WHEN status = 'succeeded' AND retry_count > 0 THEN 1 ELSE 0 END) as remediated_success,
+                    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_steps,
+                    SUM(retry_count) as total_retries
+                FROM step_runs
+            """)
+            row = cursor.fetchone()
+
+            total = row["total_steps"] or 0
+            first_pass = row["first_pass_success"] or 0
+            remediated = row["remediated_success"] or 0
+            failed = row["failed_steps"] or 0
+            retries = row["total_retries"] or 0
+
+            remediated_attempts = remediated + failed
+            remediation_efficiency = (
+                round((remediated / remediated_attempts * 100.0), 1)
+                if remediated_attempts > 0
+                else 100.0
+            )
+
+            # Role-level breakdown
+            cursor.execute("""
+                SELECT 
+                    agent_role,
+                    COUNT(*) as total_steps,
+                    SUM(CASE WHEN status = 'succeeded' AND retry_count = 0 THEN 1 ELSE 0 END) as first_pass,
+                    SUM(CASE WHEN status = 'succeeded' AND retry_count > 0 THEN 1 ELSE 0 END) as remediated,
+                    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
+                    SUM(retry_count) as retries
+                FROM step_runs
+                GROUP BY agent_role
+            """)
+            role_breakdown = {}
+            for r in cursor.fetchall():
+                role_breakdown[r["agent_role"]] = {
+                    "total_steps": r["total_steps"],
+                    "first_pass": r["first_pass"],
+                    "remediated": r["remediated"],
+                    "failed": r["failed"],
+                    "total_retries": r["retries"],
+                }
+
+            return {
+                "total_dispatched_steps": total,
+                "first_pass_success": first_pass,
+                "remediated_success": remediated,
+                "failed_steps": failed,
+                "total_retries": retries,
+                "first_pass_rate_percent": round((first_pass / total * 100.0), 1) if total > 0 else 0.0,
+                "remediation_efficiency_percent": remediation_efficiency,
+                "roles": role_breakdown,
+            }
+
+    def suggest_rule_improvements(self, min_occurrences: int = 1) -> List[Dict[str, str]]:
+        """Analyzes historical step failures and retries to synthesize actionable rule/protocol refinements."""
+        suggestions = []
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT agent_role, COUNT(*) as failed_count, GROUP_CONCAT(error_message, ' ||| ') as error_traces
+                FROM step_runs
+                WHERE (status = 'failed' OR retry_count > 0) AND error_message IS NOT NULL AND error_message != ''
+                GROUP BY agent_role
+                HAVING COUNT(*) >= ?
+            """, (min_occurrences,))
+
+            for row in cursor.fetchall():
+                role = row["agent_role"]
+                failed_count = row["failed_count"]
+                traces = row["error_traces"] or ""
+
+                if "verification" in traces.lower() or "exit code" in traces.lower():
+                    suggestions.append({
+                        "role": role,
+                        "category": "Verification Failure",
+                        "impact": f"{failed_count} step(s) failed on-disk verification",
+                        "recommendation": (
+                            f"Update 'protocols/ENGINEERING_STANDARDS.md': Add explicit pre-verification checklist "
+                            f"or mock fixtures for @{role} before invoking test suites."
+                        ),
+                    })
+                elif "security" in traces.lower() or "access denied" in traces.lower() or "boundary" in traces.lower():
+                    suggestions.append({
+                        "role": role,
+                        "category": "Security Boundary Violation",
+                        "impact": f"{failed_count} step(s) tripped path sandbox restrictions",
+                        "recommendation": (
+                            f"Review 'protocols/SUBAGENT_DISPATCH.md': Ensure Orchestrator populates allowed_paths "
+                            f"in TaskContract scope to encompass all needed directories for @{role}."
+                        ),
+                    })
+                elif "timeout" in traces.lower():
+                    suggestions.append({
+                        "role": role,
+                        "category": "Step Timeout",
+                        "impact": f"{failed_count} step(s) timed out",
+                        "recommendation": (
+                            f"Decompose @{role} tasks into smaller atomic steps in workflow definitions "
+                            f"or raise step.timeout_seconds."
+                        ),
+                    })
+                else:
+                    suggestions.append({
+                        "role": role,
+                        "category": "Execution Failure",
+                        "impact": f"{failed_count} step(s) failed with runtime errors",
+                        "recommendation": (
+                            f"Review recent error traces for @{role}. If recurring, codify guardrails or "
+                            f"negative constraints into 'agents/{role}.md' or relevant skill leaf."
+                        ),
+                    })
+
+        return suggestions
