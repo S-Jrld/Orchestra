@@ -4,6 +4,7 @@ import json
 import tempfile
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 from orchestra.adapters.antigravity import AntigravityAdapter
 from orchestra.models import SkillManifest
@@ -12,9 +13,15 @@ from orchestra.models import SkillManifest
 class TestAntigravityAdapter(unittest.TestCase):
     def test_environment_validation(self):
         adapter = AntigravityAdapter()
-        ok, issues = adapter.validate_environment()
-        # agy CLI is present in PATH on this system
-        self.assertTrue(ok)
+        with patch("shutil.which", return_value="/usr/local/bin/agy"):
+            ok, issues = adapter.validate_environment()
+            self.assertTrue(ok)
+            self.assertEqual(len(issues), 0)
+
+        with patch("shutil.which", return_value=None):
+            ok_missing, issues_missing = adapter.validate_environment()
+            self.assertFalse(ok_missing)
+            self.assertIn("not found in PATH", issues_missing[0])
 
     def test_plugin_packaging(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
