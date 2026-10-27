@@ -1,0 +1,42 @@
+name: Orchestra CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test & Conformance (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Validate Markdown Integrity & Token Bounds
+        run: bash scripts/validate.sh
+
+      - name: Verify CLI Health & Doctor
+        run: |
+          chmod +x bin/orch
+          ./bin/orch version
+          ./bin/orch doctor
+
+      - name: Run Automated Test Suite
+        run: |
+          PYTHONPATH=. python3 -m unittest discover -s tests -p "test_*.py" -v
+
+      - name: Run Token Efficiency Benchmark
+        run: |
+          ./bin/orch benchmark
