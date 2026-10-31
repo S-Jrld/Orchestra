@@ -4,7 +4,9 @@
 
 ## Session vs Task Skills
 
-- **Session-Level (Ambient)**: [skills/caveman.md](skills/caveman.md) — Voice & token saving engine. Active across whole session.
+- **Session-Level (Ambient Engines)**:
+  - [skills/caveman.md](skills/caveman.md) — Voice & token saving engine. Active across whole session.
+  - [skills/ponytail.md](skills/ponytail.md) — Code minimalism & quality engine. Lazy senior dev ladder active across all tasks.
 - **Task-Level (On-Demand)**: Domain skills below. Ingested one at a time, strictly on trigger match.
 
 ---
@@ -22,6 +24,7 @@
 | **Deep dependency & structure graph**| [skills/graphify.md](skills/graphify.md) | Normal | Knowledge graph built, god-nodes reported |
 | **System diagrams & C4 models** | [skills/archify.md](skills/archify.md) | Normal | Mermaid / SVG diagram validated & rendered |
 | **Performance, bundle, latency fix**| [skills/addy_osmani.md](skills/addy_osmani.md) | Normal–Complex | Metrics measured before AND after; no speculative cache |
+| **Minimal code, anti-bloat, YAGNI** | [skills/ponytail.md](skills/ponytail.md) | Ambient / Normal | Smallest working diff; `/ponytail-review`, `/ponytail-audit`, `/ponytail-debt` |
 | **Cross-module refactor, auth, data**| [protocols/SUBAGENT_DISPATCH.md](protocols/SUBAGENT_DISPATCH.md) | Complex | Scoped subagent plan confirmed, threat reviewed |
 | **Subsystem, framework, store change**| [protocols/ENGINEERING_STANDARDS.md](protocols/ENGINEERING_STANDARDS.md) | Architectural | ADR approved in `DECISIONS.md` before coding |
 
@@ -31,9 +34,11 @@
 
 When a task matches multiple domains (e.g. Fullstack Feature = Superpowers + Impeccable + Archify):
 1. **Pipeline Order**:
-   `Discovery (Understand Anything / Graphify) → Design / ADR → Logic TDD (Superpowers) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
+   `Discovery (Understand Anything / Graphify) → Design / ADR → Minimal Logic TDD (Superpowers / Ponytail) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
 2. **Never Parallel-Load Skills**: Load exactly one task skill leaf at a time corresponding to active pipeline stage. Unload / return before advancing.
-3. **Ambient Caveman Floor**: [skills/caveman.md](skills/caveman.md) remains permanently active to minimize token overhead throughout every stage.
+3. **Ambient Engine Floors**:
+   - [skills/caveman.md](skills/caveman.md) permanently active to minimize conversational token overhead.
+   - [skills/ponytail.md](skills/ponytail.md) permanently active to enforce minimal diffs, zero bloat, and debt tracking.
 
 ---
 

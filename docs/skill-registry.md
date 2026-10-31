@@ -26,6 +26,7 @@ skills/<skill-id>/
 | `understand_anything`| Understand Anything | 1.0.0 | `task-leaf` | Codebase onboarding and visual interactive tours. |
 | `archify` | Archify System Diagrams | 1.0.0 | `task-leaf` | Validated Mermaid models, sequence and C4 diagrams. |
 | `addy_osmani` | Addy Osmani Performance Patterns | 0.6.13 | `task-leaf` | Bundle hygiene, DOM virtualization, and latency fixes. |
+| `ponytail` | Ponytail Lazy Senior Dev Engine | 5.3.2 | `task-leaf` | Smallest complete change, YAGNI, pattern reuse, and debt tracking. |
 
 ## CLI Commands
 

@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ui_ux_pro_max",
+  "name": "UI/UX Pro Max Design Intelligence",
+  "version": "2.15.0",
+  "kind": "task-leaf",
+  "summary": "Design intelligence dataset and search engine for palettes, typography, UI styles, charts, and UX best practices.",
+  "source": {
+    "repo": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    "revision": "v2.15.0",
+    "license": "MIT",
+    "upstream_author": "Next Level Builder"
+  },
+  "triggers": {
+    "intents": [
+      "design system",
+      "color palette",
+      "font pairing",
+      "ux guidelines",
+      "chart selection",
+      "style system"
+    ],
+    "keywords": [
+      "palette",
+      "typography",
+      "font",
+      "color",
+      "theme",
+      "design-system",
+      "chart"
+    ],
+    "command_triggers": [
+      "/ui-ux-pro-max"
+    ]
+  },
+  "capabilities": [
+    "design_system_search",
+    "palette_recommendation",
+    "typography_pairing"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true,
+    "min_python": "3.8"
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 900,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

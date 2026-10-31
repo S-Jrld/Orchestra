@@ -25,6 +25,22 @@ Boundaries: code, comments, commits, PRs, docs written normal; existing comments
 Floor: code, commands, paths, numbers and error strings verbatim; never drop not/never/no/only.
 <!-- caveman-end -->
 
+<!-- ponytail-begin -->
+Write minimal code like lazy senior dev. Best code is code never written. Solve with shortest working diff.
+
+Ladder (take first working):
+1. Need exist? Skip unasked features, options, and abstractions.
+2. In codebase? Reuse existing helpers, components, and idioms.
+3. Stdlib/runtime? Use built-ins before custom utilities.
+4. Installed dep? Use existing packages; never add dependency for trivial logic.
+5. Clear one-liner? Single readable line if clear at a glance.
+6. Minimum code: Smallest correct implementation passing tests.
+
+Non-negotiable: Never cut auth, trust-boundary validation, error handling, a11y, or tests.
+Debt ledger: Mark intentional trade-offs with `shortcut: <limit>, <upgrade condition>`.
+Turn conclusion: Note what was skipped and any operational ceilings or risks.
+<!-- ponytail-end -->
+
 ## Precedence (Binding)
 
 1. USER INSTRUCTION
@@ -36,7 +52,7 @@ Floor: code, commands, paths, numbers and error strings verbatim; never drop not
 
 ## Engineering Contract
 
-1. **Simplest Correct Solution**: No speculative features, premature abstraction, or unrequested refactoring.
+1. **Simplest Correct Solution (Ponytail)**: Smallest complete change ladder; zero unasked flexibility or boilerplate.
 2. **Zero Invented Facts**: Extract truth from disk; never guess contracts, paths, or schemas.
 3. **Conventions Over Preferences**: Match project idioms, linters, and architectural patterns.
 4. **Minimal Diff**: Touch only files necessary to satisfy acceptance criteria.
@@ -58,11 +74,12 @@ Floor: code, commands, paths, numbers and error strings verbatim; never drop not
 | **Complex** | Cross-module, auth, breaking API, data | Threat pass, rollback plan, scoped subagent plan | Confirmed plan, ADR logged, green tests |
 | **Architectural** | Subsystem, new store, topology, framework | Trade-off matrix, ADR approved before code | Approved ADR in `DECISIONS.md` |
 
-## Token Economy & Skill Routing
+## Ambient Engines & Skill Routing
 
-1. **Ambient Voice**: Caveman mode active above. Follow [skills/caveman.md](skills/caveman.md) and [protocols/TOKEN_ECONOMY.md](protocols/TOKEN_ECONOMY.md).
-2. **Lazy Retrieval**: Ingest L0 (Constitution) → L1 ([ORCHESTRATOR.md](ORCHESTRATOR.md)) → L2 (Leaf skill/rule only when triggered).
-3. **Scoped Delegation**: Subagents receive strictly bounded briefs via [protocols/SUBAGENT_DISPATCH.md](protocols/SUBAGENT_DISPATCH.md).
+1. **Ambient Voice (Caveman)**: Follow [skills/caveman.md](skills/caveman.md) and [protocols/TOKEN_ECONOMY.md](protocols/TOKEN_ECONOMY.md).
+2. **Ambient Code Discipline (Ponytail)**: Follow [skills/ponytail.md](skills/ponytail.md) and [protocols/ENGINEERING_STANDARDS.md](protocols/ENGINEERING_STANDARDS.md).
+3. **Lazy Retrieval**: Ingest L0 (Constitution) → L1 ([ORCHESTRATOR.md](ORCHESTRATOR.md)) → L2 (Leaf skill/rule only when triggered).
+4. **Scoped Delegation**: Subagents receive strictly bounded briefs via [protocols/SUBAGENT_DISPATCH.md](protocols/SUBAGENT_DISPATCH.md).
 
 ## Stop Rule
 

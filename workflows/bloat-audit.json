@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "id": "bloat-audit",
+  "version": "1.0.0",
+  "name": "Codebase Bloat and Technical Debt Audit",
+  "description": "Audits repository for dead code, speculative abstractions, load bottlenecks, and ponytail shortcut debt.",
+  "tier": "Normal",
+  "steps": [
+    {
+      "id": "map_surface",
+      "name": "Map repository modules and dependencies",
+      "agent_role": "researcher",
+      "required_skills": ["understand_anything", "graphify"],
+      "dependencies": [],
+      "verification_command": "true"
+    },
+    {
+      "id": "audit_bloat",
+      "name": "Audit codebase for bloat and over-engineering",
+      "agent_role": "reviewer",
+      "required_skills": ["ponytail"],
+      "dependencies": ["map_surface"],
+      "verification_command": "true"
+    },
+    {
+      "id": "compile_debt_ledger",
+      "name": "Scan shortcut markers and generate technical debt ledger",
+      "agent_role": "orchestra",
+      "required_skills": ["ponytail"],
+      "dependencies": ["audit_bloat"],
+      "verification_command": "true"
+    }
+  ],
+  "acceptance_criteria": [
+    "Codebase structure mapped",
+    "Bloat and deletion candidates identified",
+    "Technical debt ledger compiled"
+  ]
+}

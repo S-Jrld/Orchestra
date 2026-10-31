@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "id": "superpowers",
+  "name": "Superpowers Execution Engine",
+  "version": "7.0.0",
+  "kind": "task-leaf",
+  "summary": "Execution engine for structured feature development, brainstorming, TDD cycles, and subagent orchestration.",
+  "source": {
+    "repo": "https://github.com/obra/superpowers.git",
+    "revision": "bb92a77",
+    "license": "MIT",
+    "upstream_author": "Jesse Vincent"
+  },
+  "triggers": {
+    "intents": [
+      "new feature",
+      "bugfix",
+      "logic change",
+      "refactor",
+      "tdd",
+      "plan execution"
+    ],
+    "keywords": [
+      "feature",
+      "fix",
+      "test",
+      "tdd",
+      "plan",
+      "implement",
+      "add",
+      "build",
+      "create",
+      "endpoint"
+    ],
+    "command_triggers": [
+      "/superpowers",
+      "/tdd"
+    ]
+  },
+  "capabilities": [
+    "tdd_enforcement",
+    "task_decomposition",
+    "structured_execution"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 850,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "medium",
+    "read_only": false,
+    "requires_approval": false
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "id": "graphify",
+  "name": "Graphify Knowledge Graph",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "Codebase structural mapping, knowledge graph generation, community detection, and god-node discovery.",
+  "source": {
+    "repo": "https://github.com/S-Jrld/Orchestra",
+    "revision": "v1.0.0",
+    "license": "MIT"
+  },
+  "triggers": {
+    "intents": [
+      "dependency graph",
+      "codebase structure",
+      "god nodes",
+      "circular dependencies",
+      "architecture graph"
+    ],
+    "keywords": [
+      "graph",
+      "dependency",
+      "coupling",
+      "structure",
+      "god-node",
+      "callgraph"
+    ],
+    "command_triggers": [
+      "/graphify"
+    ]
+  },
+  "capabilities": [
+    "structural_mapping",
+    "dependency_analysis",
+    "god_node_detection"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 750,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

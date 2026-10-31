@@ -24,6 +24,7 @@ REQUIRED_FILES=(
     "skills/understand_anything.md"
     "skills/archify.md"
     "skills/addy_osmani.md"
+    "skills/ponytail.md"
     "templates/ACTIVE_TASK.md"
     "templates/ADR_TEMPLATE.md"
     "templates/EXECUTION_BRIEF.md"

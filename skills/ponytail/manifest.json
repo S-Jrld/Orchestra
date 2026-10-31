@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ponytail",
+  "name": "Ponytail Lazy Senior Dev Engine",
+  "version": "5.3.2",
+  "kind": "task-leaf",
+  "summary": "Enforces the smallest complete change, YAGNI decision ladder, existing pattern reuse, and debt tracking.",
+  "source": {
+    "repo": "https://github.com/DietrichGebert/ponytail.git",
+    "revision": "v5.3.2",
+    "license": "MIT",
+    "upstream_author": "Dietrich Gebert"
+  },
+  "triggers": {
+    "intents": [
+      "minimal code",
+      "simplest solution",
+      "yagni",
+      "anti-bloat",
+      "code review",
+      "debt ledger",
+      "repo audit",
+      "lazy dev"
+    ],
+    "keywords": [
+      "ponytail",
+      "minimal",
+      "simplest",
+      "yagni",
+      "bloat",
+      "lazy",
+      "shortcut",
+      "over-engineering"
+    ],
+    "command_triggers": [
+      "/ponytail",
+      "/ponytail-review",
+      "/ponytail-audit",
+      "/ponytail-debt"
+    ]
+  },
+  "capabilities": [
+    "minimalist_implementation",
+    "yagni_enforcement",
+    "code_review",
+    "bloat_audit",
+    "debt_tracking"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true,
+    "min_python": "3.8"
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 750,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": false,
+    "requires_approval": false
+  }
+}

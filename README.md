@@ -51,7 +51,7 @@ Orchestra solves this with a **Unified Single-Primary-Agent Paradigm**:
 
 ```mermaid
 flowchart TD
-    User["Developer / Agent Host"] -->|"Single Prompt / Task"| Orch["@orchestra (Single Primary Agent)<br/>L0 Constitution + L1 Router + Caveman Voice"]
+    User["Developer / Agent Host"] -->|"Single Prompt / Task"| Orch["@orchestra (Single Primary Agent)<br/>L0 Constitution + L1 Router + Caveman & Ponytail Ambient Engines"]
 
     subgraph SpecialistWorkers ["Internal Specialist Subagents (Hidden from Menu)"]
         direction TB
@@ -371,7 +371,7 @@ Rather than dumping 30,000+ tokens of monolithic rules into every prompt, Orches
 
 | Layer | Component | Context Cost | Lifecycle |
 |---|---|:---:|---|
-| **L0 Kernel** | [`AGENTS.md`](AGENTS.md) | ~500 tokens | Permanent constitutional system prompt (includes Caveman engine) |
+| **L0 Kernel** | [`AGENTS.md`](AGENTS.md) | ~700 tokens | Permanent constitutional system prompt (includes Caveman & Ponytail engines) |
 | **L1 Router** | [`ORCHESTRATOR.md`](ORCHESTRATOR.md) | ~400 tokens | Transient classification and skill routing table |
 | **L2 Leaf** | [`skills/<id>/SKILL.md`](skills/) | ~600–900 tokens | Single active domain skill loaded strictly on demand |
 | **L3 Artifacts** | [`templates/`](templates/) | Variable | Execution briefs, ADRs, test results, and verification proofs |
@@ -389,6 +389,21 @@ You can adjust compression at any time using slash commands:
 - `/ultracave`: Extreme density; technical facts stated once (~60–70% reduction).
 - `/megacave`: Classical Chinese (文言文) mode for ultra-compact payloads (~75% reduction).
 - `stop caveman`: Disables Caveman voice; resumes standard conversational prose.
+
+### Ambient Code Quality: Ponytail Engine
+
+Orchestra enforces the **Smallest Complete Change Ladder** on every code edit via the Ponytail engine:
+- **53% code reduction, 45% tokens saved, 98% test coverage** for risky logic without speculative bloat.
+- **Decision Ladder**: Does it need to exist? (YAGNI) → Already in codebase? (Reuse) → Stdlib/platform feature? → Installed dependency? → Clear one-liner? → Minimum code that works.
+- **Non-negotiable floors**: Never cut validation at trust boundaries, error handling, security/auth checks, a11y standards (WCAG AA), or automated tests.
+- **Technical Debt Ledger**: Intentional trade-offs are documented with `shortcut: <the limit>, <when to upgrade>`.
+- **Response Sign-off**: Every code turn concludes with what was skipped and known operational ceilings.
+
+Specialist commands:
+- `/ponytail`: Enforces smallest complete change (default).
+- `/ponytail-review`: Strict diff audit (correct, safe, load-resilient, tested, lean).
+- `/ponytail-audit`: Full codebase scan for bloat, dead code, and merge/delete candidates.
+- `/ponytail-debt`: Scan and format all marked shortcuts into a prioritized debt ledger.
 
 ### Empirical Benchmark Results
 
@@ -448,6 +463,7 @@ All skills conform to the canonical portable layout (`skills/<id>/SKILL.md` + `m
 | [`understand_anything`](skills/understand_anything/SKILL.md) | `task-leaf` | Codebase onboarding, functional mental model | `Egonex-AI/Understand-Anything` (MIT) |
 | [`archify`](skills/archify/SKILL.md) | `task-leaf` | Architecture diagrams, C4 models, Mermaid specs | `tt-a1i/archify` (MIT) |
 | [`addy_osmani`](skills/addy_osmani/SKILL.md) | `task-leaf` | Web performance, bundle optimization, Core Web Vitals | `addyosmani/agent-skills` (MIT) |
+| [`ponytail`](skills/ponytail/SKILL.md) | `task-leaf` | Minimal code, anti-bloat, YAGNI, code review, debt tracking | `DietrichGebert/ponytail` (MIT) |
 
 ---
 

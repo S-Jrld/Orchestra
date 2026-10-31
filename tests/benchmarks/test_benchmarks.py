@@ -70,6 +70,12 @@ class BenchmarkRunner:
             expected_skill="addy_osmani",
         ),
         BenchmarkScenario(
+            name="Minimalist Code & YAGNI",
+            tier=Tier.NORMAL,
+            task="Refactor helper function with simplest solution and remove over-engineering using ponytail",
+            expected_skill="ponytail",
+        ),
+        BenchmarkScenario(
             name="Cross-Module Auth Refactor",
             tier=Tier.COMPLEX,
             task="Cross-module auth token migration across user services with security review",

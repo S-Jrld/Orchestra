@@ -70,7 +70,7 @@ class ContextBuilder:
                     content=content,
                     token_count=tokens,
                     content_hash=self.hash_content(content),
-                    reason="Permanent constitutional kernel & Caveman engine",
+                    reason="Permanent constitutional kernel & ambient engines (Caveman + Ponytail)",
                 )
             )
             layer_tokens["L0"] += tokens

@@ -36,7 +36,7 @@
       "id": "implement_green",
       "name": "Implement minimal solution",
       "agent_role": "orchestra",
-      "required_skills": ["superpowers"],
+      "required_skills": ["superpowers", "ponytail"],
       "dependencies": ["test_red"],
       "target_files": ["src/auth.py"],
       "verification_command": "true"
@@ -45,6 +45,7 @@
       "id": "audit_diff",
       "name": "Security and scope audit",
       "agent_role": "reviewer",
+      "required_skills": ["ponytail"],
       "dependencies": ["implement_green"],
       "verification_command": "true"
     }

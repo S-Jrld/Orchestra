@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "id": "understand_anything",
+  "name": "Understand Anything Onboarding",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "Multi-agent codebase onboarding, hierarchical functional parsing, and guided exploration tours.",
+  "source": {
+    "repo": "https://github.com/Egonex-AI/Understand-Anything.git",
+    "revision": "f2d0164",
+    "license": "MIT",
+    "upstream_author": "Egonex AI"
+  },
+  "triggers": {
+    "intents": [
+      "codebase discovery",
+      "onboarding",
+      "where do I start",
+      "understand repo",
+      "system overview"
+    ],
+    "keywords": [
+      "onboarding",
+      "explore",
+      "understand",
+      "tour",
+      "architecture",
+      "start"
+    ],
+    "command_triggers": [
+      "/understand-anything"
+    ]
+  },
+  "capabilities": [
+    "codebase_onboarding",
+    "architecture_synthesis",
+    "interactive_tour"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 700,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

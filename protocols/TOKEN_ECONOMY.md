@@ -8,7 +8,7 @@ Never preload broad documentation, full skill packs, or entire codebases into sy
 
 ```
 +-----------------------------------------------------------+
-| Layer 0: Constitutional Kernel (AGENTS.md)                |  ~500 tokens (Permanent + Caveman)
+| Layer 0: Constitutional Kernel (AGENTS.md)                |  ~700 tokens (Permanent + Caveman + Ponytail)
 +-----------------------------------------------------------+
                              | (on task intake)
 +-----------------------------------------------------------+
@@ -22,16 +22,24 @@ Never preload broad documentation, full skill packs, or entire codebases into sy
 
 - **Rule**: Never load multiple Layer 2 leaves at the same time. Finish or unload the current stage before loading the next.
 
-## 2. Terse Communication Standard (Caveman Engine)
+## 2. Ambient Engines: Voice (Caveman) & Code (Ponytail)
 
+Orchestra applies twin ambient engines across every turn to minimize token consumption and maximize density:
+
+### A. Ambient Voice: Caveman Engine
 Follow the complete Caveman specification in [skills/caveman.md](../skills/caveman.md). Reader and agent compute costs token dollars. Every word must carry payload value.
-
-### Principles:
-1. **Kill Ceremony**: No greetings ("Hello!", "Certainly!"), pleasantries, apologies, or conversational sign-offs.
-2. **Answer First**: Provide conclusion or result in line 1, followed by evidence, followed by next steps. Pattern: `[thing] [action] [reason]. [next step].`
-3. **Payload Verbatim**: Code blocks, diffs, terminal commands, directory paths, numbers, and error traces remain 100% verbatim. Never compress or omit necessary code.
-4. **Active & Imperative Voice**: "Run tests with `pytest`", not "It would be advisable to now execute the test suite using pytest".
+1. **Kill Ceremony**: No greetings, pleasantries, apologies, or conversational sign-offs.
+2. **Answer First**: Conclusion in line 1, then evidence, then next step. Pattern: `[thing] [action] [reason]. [next step].`
+3. **Payload Verbatim**: Code blocks, diffs, terminal commands, directory paths, numbers, and error traces remain 100% verbatim.
+4. **Active & Imperative Voice**: Imperative commands, ASD-STE100 floor (<20 words/sentence).
 5. **No Recapitulation**: Do not repeat user's prompt back to them.
+
+### B. Ambient Code Minimalism: Ponytail Engine
+Follow the Ponytail specification in [skills/ponytail.md](../skills/ponytail.md). Bloat in code compounds token cost across all future context windows.
+1. **The Smallest Complete Change**: Take the lowest rung on the ladder (YAGNI → Codebase reuse → Stdlib/runtime → Installed dep → Clear one-liner → Minimal code).
+2. **Zero Speculative Extras**: No premature abstractions, unused interfaces, or boilerplate.
+3. **Explicit Sign-Off**: Conclude turns with what was skipped and known ceilings.
+4. **Shortcut Markers**: Tag necessary debt with `shortcut: <limit>, <upgrade condition>`.
 
 ### Banned Filler Patterns:
 - ❌ "I would be happy to help you with that!"
