@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import os
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -23,6 +24,15 @@ class ReviewSynthesizer:
 
     def __init__(self, workspace_root: Optional[Path] = None):
         self.workspace_root = (workspace_root or Path.cwd()).resolve()
+
+    def _get_clean_env(self) -> dict[str, str]:
+        env = os.environ.copy()
+        env["GH_PAGER"] = "cat"
+        env["GIT_PAGER"] = "cat"
+        bin_dir = str(self.workspace_root / "bin")
+        local_bin = str(Path.home() / ".local" / "bin")
+        env["PATH"] = f"{bin_dir}:{local_bin}:{env.get('PATH', '')}"
+        return env
 
     def determine_verdict(
         self,
@@ -54,6 +64,7 @@ class ReviewSynthesizer:
         verification_outcomes: List[VerificationOutcome],
         findings: List[ReviewFinding],
         impacted_dependencies: Optional[Dict[str, List[str]]] = None,
+        open_questions: Optional[List[str]] = None,
     ) -> PRReviewReport:
         """Synthesizes the complete PRReviewReport dataclass."""
         verdict = self.determine_verdict(verification_outcomes, findings)
@@ -62,7 +73,7 @@ class ReviewSynthesizer:
         # Draft executive summary
         summary_parts = [
             f"Review for PR #{metadata.number} ('{metadata.title}') by @{metadata.author}.",
-            f"Evaluated branch `{metadata.head_ref}` against target `{metadata.base_ref}`.",
+            f"Evaluated branch `{metadata.head_ref}` against target `{metadata.base_ref}` (+{metadata.additions}, -{metadata.deletions}).",
             f"Deterministic Verdict: **{verdict.value}**.",
         ]
         if verdict == ReviewVerdict.APPROVE:
@@ -83,6 +94,7 @@ class ReviewSynthesizer:
             verification_outcomes=verification_outcomes,
             findings=findings,
             impacted_dependencies=impacted_dependencies or {},
+            open_questions=open_questions or [],
             created_at=created_at,
         )
 
@@ -134,19 +146,27 @@ class ReviewSynthesizer:
             ConventionalCommentsFormatter.format_all(report.findings),
         ])
 
+        if report.open_questions:
+            lines.extend([
+                "",
+                "## 5. Open Questions & Non-Blocking Notes",
+            ])
+            for q in report.open_questions:
+                lines.append(f"- {q}")
+
         return "\n".join(lines)
 
     def save_report(self, report: PRReviewReport, output_dir: Optional[Path] = None) -> Path:
-        """Saves the markdown review to disk."""
-        target_dir = (output_dir or (self.workspace_root / ".orchestra" / "reviews")).resolve()
+        """Saves the markdown review to disk under .orchestra/reports/pr-<number>-review.md."""
+        target_dir = (output_dir or (self.workspace_root / ".orchestra" / "reports")).resolve()
         target_dir.mkdir(parents=True, exist_ok=True)
-        file_path = target_dir / f"PR-{report.pr_number}-review.md"
+        file_path = target_dir / f"pr-{report.pr_number}-review.md"
         content = self.render_markdown(report)
         file_path.write_text(content, encoding="utf-8")
         return file_path
 
     def publish_review(self, report: PRReviewReport, dry_run: bool = False) -> bool:
-        """Human-in-the-loop publishing gate executing `gh pr review`."""
+        """Human-in-the-loop publishing gate executing non-interactive gh pr review."""
         if dry_run:
             return False
 
@@ -165,6 +185,7 @@ class ReviewSynthesizer:
                 capture_output=True,
                 text=True,
                 check=False,
+                env=self._get_clean_env(),
             )
             return res.returncode == 0
         except Exception:

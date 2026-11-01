@@ -49,6 +49,8 @@ class PRMetadata:
     base_ref: str
     head_ref: str
     head_sha: str = ""
+    additions: int = 0
+    deletions: int = 0
     commits: List[Dict[str, Any]] = field(default_factory=list)
     files: List[ChangedFile] = field(default_factory=list)
     url: str = ""
@@ -104,4 +106,5 @@ class PRReviewReport:
     verification_outcomes: List[VerificationOutcome] = field(default_factory=list)
     findings: List[ReviewFinding] = field(default_factory=list)
     impacted_dependencies: Dict[str, List[str]] = field(default_factory=dict)
+    open_questions: List[str] = field(default_factory=list)
     created_at: str = ""

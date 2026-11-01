@@ -9,6 +9,7 @@ Thumbs.db
 # Temp
 *.tmp
 *.swp
+bin/gh
 
 # Python
 __pycache__/
@@ -19,6 +20,7 @@ __pycache__/
 # Local execution runs
 .orchestra/runs/*.json
 .orchestra/reviews/*.md
+.orchestra/reports/*.md
 .orchestra/escalations/*.md
 .orchestra/audit.jsonl
 .orchestra/*.db

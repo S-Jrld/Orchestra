@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
+import subprocess
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from orchestra.pr.models import ChangedFile, VerificationOutcome
-from orchestra.workflow.verifier import WorkflowVerifier
+
+
+class MissingEnvironmentBlockerError(Exception):
+    """Tier 1 Blocker: Missing .env or stopped services required for verification."""
+    pass
 
 
 class TerminalVerificationRunner:
@@ -17,6 +23,34 @@ class TerminalVerificationRunner:
 
     def __init__(self, workspace_root: Optional[Path] = None):
         self.workspace_root = (workspace_root or Path.cwd()).resolve()
+
+    def _get_clean_env(self) -> dict[str, str]:
+        env = os.environ.copy()
+        env["CI"] = "true"
+        env["GIT_PAGER"] = "cat"
+        env["GH_PAGER"] = "cat"
+        bin_dir = str(self.workspace_root / "bin")
+        local_bin = str(Path.home() / ".local" / "bin")
+        env["PATH"] = f"{bin_dir}:{local_bin}:{env.get('PATH', '')}"
+        return env
+
+    def _run_cmd(self, command: str, timeout: int = 180) -> tuple[int, str]:
+        try:
+            res = subprocess.run(
+                command,
+                shell=True,
+                cwd=str(self.workspace_root),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                env=self._get_clean_env(),
+            )
+            output = (res.stdout + "\n" + res.stderr).strip()
+            return res.returncode, output
+        except subprocess.TimeoutExpired:
+            return -1, f"Command timed out after {timeout} seconds: {command}"
+        except Exception as e:
+            return 1, f"Command execution failed: {str(e)}"
 
     def run_all(
         self,
@@ -67,7 +101,7 @@ class TerminalVerificationRunner:
             cmd = "npm ls --depth=0 || true"
 
         t0 = time.time()
-        code, out = WorkflowVerifier.run_command(cmd, cwd=str(self.workspace_root))
+        code, out = self._run_cmd(cmd)
         duration = time.time() - t0
 
         return VerificationOutcome(
@@ -91,7 +125,6 @@ class TerminalVerificationRunner:
             if shutil.which("ruff"):
                 cmd = f"ruff check {' '.join(high_signal)}"
         if not cmd and (self.workspace_root / "package.json").exists() and shutil.which("npm"):
-            # Check if lint script exists in package.json
             cmd = "npm run lint || true"
         if not cmd and (self.workspace_root / "bin" / "orch").exists():
             cmd = "./bin/orch validate"
@@ -100,7 +133,7 @@ class TerminalVerificationRunner:
             return None
 
         t0 = time.time()
-        code, out = WorkflowVerifier.run_command(cmd, cwd=str(self.workspace_root))
+        code, out = self._run_cmd(cmd)
         duration = time.time() - t0
 
         diagnostics = self.parse_lint_diagnostics(out)
@@ -126,14 +159,21 @@ class TerminalVerificationRunner:
                 cmd = "python3 -m unittest discover tests"
         # Node test discovery
         elif (self.workspace_root / "package.json").exists() and shutil.which("npm"):
-            cmd = "npm test"
+            cmd = "npm test -- --run"
 
         if not cmd:
             return None
 
         t0 = time.time()
-        code, out = WorkflowVerifier.run_command(cmd, cwd=str(self.workspace_root), timeout=300)
+        code, out = self._run_cmd(cmd, timeout=300)
         duration = time.time() - t0
+
+        # Tier 1 Blocker check: missing env or database connection
+        if code != 0:
+            if "operationalerror: could not connect to server" in out.lower() or "connection refused" in out.lower() or "missing required environment variable" in out.lower():
+                raise MissingEnvironmentBlockerError(
+                    f"Tier 1 Blocker: Test failed due to unstarted service or missing .env variable: {out[:300]}"
+                )
 
         diagnostics = self.parse_test_diagnostics(out)
 
@@ -163,7 +203,7 @@ class TerminalVerificationRunner:
             return None
 
         t0 = time.time()
-        code, out = WorkflowVerifier.run_command(cmd, cwd=str(self.workspace_root), timeout=180)
+        code, out = self._run_cmd(cmd, timeout=180)
         duration = time.time() - t0
 
         return VerificationOutcome(
@@ -178,7 +218,6 @@ class TerminalVerificationRunner:
     def parse_lint_diagnostics(self, output: str) -> List[Dict[str, Any]]:
         """Extracts file, line, rule, and message from linter output."""
         diagnostics = []
-        # Pattern: path/to/file.py:42:10: RULE Message
         pattern = re.compile(r"^([^:\n]+):(\d+):(?:\d+:)?\s*([A-Z0-9]+)?\s*(.*)$", re.MULTILINE)
         for match in pattern.finditer(output):
             path, line, rule, message = match.groups()
@@ -194,7 +233,6 @@ class TerminalVerificationRunner:
     def parse_test_diagnostics(self, output: str) -> List[Dict[str, Any]]:
         """Extracts failed test names and assertion failures from test logs."""
         diagnostics = []
-        # Python unittest: FAIL: test_name (module.TestCase)
         unittest_fail = re.compile(r"^(?:FAIL|ERROR):\s*(\S+)\s*\(([^)]+)\)", re.MULTILINE)
         for match in unittest_fail.finditer(output):
             test_name, test_suite = match.groups()
@@ -205,7 +243,6 @@ class TerminalVerificationRunner:
                 "summary": f"Failed in {test_suite}.{test_name}",
             })
 
-        # Pytest: FAILED tests/test_foo.py::test_bar - AssertionError: ...
         pytest_fail = re.compile(r"^FAILED\s+([^:]+)::(\S+)(?:\s+-\s+(.*))?$", re.MULTILINE)
         for match in pytest_fail.finditer(output):
             file_path, test_name, reason = match.groups()

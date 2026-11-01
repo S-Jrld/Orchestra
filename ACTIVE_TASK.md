@@ -3,7 +3,7 @@
 > Current single-task truth. Overwrite when complete; keep under 30 lines.
 
 ## Goal
-Implement local VS Code PR orchestration workflow in Orchestra: pre-flight safety snapshot, ingestion pipeline, terminal verification, 7-standard evaluation, Conventional Comments, and review synthesis.
+Implement autonomous non-interactive PR verification & review pipeline in Orchestra with risk-tiered autonomy (Tier 0 silent pass, Tier 1 blocker escalation, Tier 2 human publishing gate).
 
 ## Classification
 - **Tier**: Normal
@@ -11,20 +11,17 @@ Implement local VS Code PR orchestration workflow in Orchestra: pre-flight safet
 - **Activated Roles**: Principal AI Systems Architect & Staff DevOps Engineer
 
 ## Scope & Target Files
-- `orchestra/pr/`: Core safety, ingestion, dependency, verification, evaluator, formatter, synthesizer modules
-- `orchestra/cli.py`: `orch pr review` subcommand integration
-- `schemas/pr-review-record.json`: Review schema
-- `workflows/pr-orchestration.json`: Workflow DAG
-- `templates/PR_REVIEW_REPORT.md` & `templates/PR_REVIEW_PROMPT.md`: Review templates
-- `tests/unit/test_pr_*.py`: Comprehensive unit test suite
+- `orchestra/pr/`: Non-interactive safety, ingestion, dependency, verification, evaluation, synthesis
+- `orchestra/cli.py`: Risk-tiered autonomy handling (`orch pr review`)
+- Reports standard: `.orchestra/reports/pr-<number>-review.md`
+- Tests: `tests/unit/test_pr_*.py` (97 tests passing)
 
 ## Checklist
-- [x] 1. Phase 1 Discovery: Topology audit, tooling inventory, boundary definition
-- [x] 2. Phase 8 Spec & Approval: Drafted and approved `pr-orchestration-spec.md`
-- [x] 3. Modular Build: Core `orchestra/pr/` package implementation
-- [x] 4. CLI & Schema: Added `orch pr review`, review schema, workflow DAG
-- [x] 5. Automated Tests: 96/96 passing across all test suites
-- [x] 6. Dry-Run Validation: Verified end-to-end review on REACH PR #20 with zero workspace corruption
+- [x] 1. Implementation Spec: Approved `pr-workflow-spec.md`
+- [x] 2. Non-Interactive CLI Standards: Enforced `GIT_PAGER=cat`, `GH_PAGER=cat`, `CI=true`
+- [x] 3. Risk-Tiered Governance: Tier 0 silent auto-execution, Tier 1 blocker traps, Tier 2 review gate
+- [x] 4. Report Standard: Generates `.orchestra/reports/pr-<PR>-review.md` with Open Questions
+- [x] 5. Test Suite: 97/97 tests green, repository validation clean
 
 ## Blockers & Open Decisions
 - None. System is fully operational and validated.

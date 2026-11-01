@@ -110,15 +110,19 @@ class TestReviewSynthesizer(unittest.TestCase):
             base_ref="main",
             head_ref="feat-test",
         )
-        report = self.synthesizer.build_report(meta, [], [])
+        report = self.synthesizer.build_report(
+            meta, [], [], open_questions=["What is the backend migration timeline?"]
+        )
         md = self.synthesizer.render_markdown(report)
         self.assertIn("# Pull Request Review: #42", md)
         self.assertIn("✅ **APPROVE**", md)
+        self.assertIn("## 5. Open Questions", md)
+        self.assertIn("What is the backend migration timeline?", md)
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = self.synthesizer.save_report(report, output_dir=Path(tmp_dir))
             self.assertTrue(path.exists())
-            self.assertIn("PR-42-review.md", path.name)
+            self.assertIn("pr-42-review.md", path.name)
 
 
 if __name__ == "__main__":

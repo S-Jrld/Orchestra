@@ -765,6 +765,8 @@ class OrchestraCLI:
 
         from orchestra.pr import (
             DependencyGraphTracer,
+            GitConflictBlockerError,
+            MissingEnvironmentBlockerError,
             MultiDimensionalEvaluator,
             PRIngestionPipeline,
             ReviewSynthesizer,
@@ -864,6 +866,10 @@ class OrchestraCLI:
                     print("Publishing cancelled by user.")
 
             return 0
+        except (GitConflictBlockerError, MissingEnvironmentBlockerError) as e:
+            print(f"\n🚨 [TIER 1 BLOCKER ESCALATION]: {e}")
+            print("Local workflow halted to prevent workspace corruption or false evaluation.")
+            return 1
         finally:
             if not no_checkout and not dry_run:
                 print("→ [Cleanup] Restoring workspace to pre-flight snapshot...")

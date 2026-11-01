@@ -17,13 +17,22 @@ from orchestra.pr.models import (
     VerificationOutcome,
     WorkspaceSnapshot,
 )
-from orchestra.pr.safety import WorkspaceSafetyError, WorkspaceSafetyWrapper
+from orchestra.pr.safety import (
+    GitConflictBlockerError,
+    WorkspaceSafetyError,
+    WorkspaceSafetyWrapper,
+)
 from orchestra.pr.synthesizer import ReviewSynthesizer
-from orchestra.pr.verification import TerminalVerificationRunner
+from orchestra.pr.verification import (
+    MissingEnvironmentBlockerError,
+    TerminalVerificationRunner,
+)
 
 __all__ = [
     "WorkspaceSafetyWrapper",
     "WorkspaceSafetyError",
+    "GitConflictBlockerError",
+    "MissingEnvironmentBlockerError",
     "PRIngestionPipeline",
     "PRIngestionError",
     "DependencyGraphTracer",

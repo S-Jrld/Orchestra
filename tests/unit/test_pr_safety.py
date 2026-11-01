@@ -16,8 +16,10 @@ class TestWorkspaceSafety(unittest.TestCase):
         # Should not raise
         self.safety.verify_tooling()
 
+    @patch("pathlib.Path.exists")
     @patch("subprocess.run")
-    def test_verify_tooling_gh_not_authenticated(self, mock_run):
+    def test_verify_tooling_gh_not_authenticated(self, mock_run, mock_exists):
+        mock_exists.return_value = False
         mock_run.side_effect = [
             MagicMock(returncode=0),  # git --version
             MagicMock(returncode=1, stderr="You are not logged in"),  # gh auth status
@@ -73,6 +75,24 @@ class TestWorkspaceSafety(unittest.TestCase):
         self.assertEqual(mock_git.call_count, 2)
         mock_git.assert_any_call(["checkout", "feature-x"])
         mock_git.assert_any_call(["stash", "pop"])
+
+
+    @patch.object(WorkspaceSafetyWrapper, "_run_git")
+    def test_restore_conflict_raises_tier1_blocker(self, mock_git):
+        from orchestra.pr.safety import GitConflictBlockerError
+        mock_git.side_effect = [
+            (0, "Switched to branch 'feature-x'"),
+            (1, "CONFLICT (content): Merge conflict in file.py"),
+        ]
+        from orchestra.pr.models import WorkspaceSnapshot
+        self.safety.snapshot = WorkspaceSnapshot(
+            original_branch="feature-x",
+            original_sha="commit123456",
+            stash_pushed=True,
+            stash_ref="test-stash",
+        )
+        with self.assertRaises(GitConflictBlockerError):
+            self.safety.restore()
 
 
 if __name__ == "__main__":
