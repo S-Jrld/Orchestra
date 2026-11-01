@@ -64,6 +64,7 @@ Turn conclusion: Note what was skipped and any operational ceilings or risks.
 10. **Server-Side Security**: Never trust client-asserted identity or bypass authentication for velocity.
 11. **Externalized Working State**: Update [ACTIVE_TASK.md](templates/ACTIVE_TASK.md); do not rely on chat memory.
 12. **Bound Every Stop**: Stop loading when diff is statable; stop coding when tier gates pass.
+13. **Guaranteed PR Review Restoration**: PR inspection must capture active branch pre-flight and unconditionally restore original branch upon completion or abortion. Never leave working tree on unmerged PR branch.
 
 ## Execution Tiers
 

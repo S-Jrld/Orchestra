@@ -185,6 +185,7 @@ class OrchestraCLI:
         pr_rev.add_argument("--dry-run", action="store_true", help="Simulate execution without modifying workspace")
         pr_rev.add_argument("--publish", action="store_true", help="Prompt to publish review via gh pr review")
         pr_rev.add_argument("--output", help="Save markdown review artifact to specific path")
+        pr_rev.add_argument("--repo-dir", help="Target git repository directory (defaults to current working directory)")
 
         args = parser.parse_args(argv)
         if not args.subcommand:
@@ -779,12 +780,15 @@ class OrchestraCLI:
             print("Error: PR identifier (number, branch, or URL) required.")
             return 1
 
-        safety = WorkspaceSafetyWrapper(self.workspace_root)
-        ingestion = PRIngestionPipeline(self.workspace_root)
-        dep_tracer = DependencyGraphTracer(self.workspace_root)
-        runner = TerminalVerificationRunner(self.workspace_root)
-        evaluator = MultiDimensionalEvaluator(self.workspace_root)
-        synthesizer = ReviewSynthesizer(self.workspace_root)
+        repo_dir = getattr(args, "repo_dir", None)
+        target_root = Path(repo_dir).resolve() if repo_dir else self.workspace_root
+
+        safety = WorkspaceSafetyWrapper(target_root)
+        ingestion = PRIngestionPipeline(target_root)
+        dep_tracer = DependencyGraphTracer(target_root)
+        runner = TerminalVerificationRunner(target_root)
+        evaluator = MultiDimensionalEvaluator(target_root)
+        synthesizer = ReviewSynthesizer(target_root)
 
         print(f"🎻 Orchestra PR Orchestration: Reviewing PR #{pr_id}...")
 

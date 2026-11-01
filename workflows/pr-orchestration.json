@@ -57,6 +57,6 @@
     "Terminal verification executed and exit codes triaged",
     "Code evaluated across 7 software engineering standards",
     "Findings categorized using Conventional Comments syntax",
-    "Review artifact persisted and workspace cleanly restored"
+    "Review artifact persisted and workspace unconditionally restored to pre-flight branch"
   ]
 }

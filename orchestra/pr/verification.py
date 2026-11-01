@@ -120,10 +120,19 @@ class TerminalVerificationRunner:
             return None
 
         cmd = None
+        # Detect monorepo subdirectories with package.json
+        subdirs_with_pkg = {
+            Path(f.path).parts[0] for f in changed_files
+            if len(Path(f.path).parts) > 1 and (self.workspace_root / Path(f.path).parts[0] / "package.json").exists()
+        }
+
         # Detect workspace tooling
         if (self.workspace_root / "ruff.toml").exists() or (self.workspace_root / "pyproject.toml").exists():
             if shutil.which("ruff"):
                 cmd = f"ruff check {' '.join(high_signal)}"
+        if not cmd and subdirs_with_pkg and shutil.which("npm"):
+            target_sub = sorted(subdirs_with_pkg)[0]
+            cmd = f"cd {target_sub} && npm run lint || true"
         if not cmd and (self.workspace_root / "package.json").exists() and shutil.which("npm"):
             cmd = "npm run lint || true"
         if not cmd and (self.workspace_root / "bin" / "orch").exists():
@@ -151,13 +160,22 @@ class TerminalVerificationRunner:
     def run_targeted_tests(self, changed_files: List[ChangedFile]) -> Optional[VerificationOutcome]:
         """Detects and runs automated tests targeting changed modules."""
         cmd = None
+        subdirs_with_pkg = {
+            Path(f.path).parts[0] for f in changed_files
+            if len(Path(f.path).parts) > 1 and (self.workspace_root / Path(f.path).parts[0] / "package.json").exists()
+        }
+
         # Python test discovery
         if (self.workspace_root / "tests").is_dir() and any(f.path.endswith(".py") for f in changed_files):
             if shutil.which("pytest"):
                 cmd = "pytest -q"
             else:
                 cmd = "python3 -m unittest discover tests"
-        # Node test discovery
+        # Monorepo Node test discovery
+        elif subdirs_with_pkg and shutil.which("npm"):
+            target_sub = sorted(subdirs_with_pkg)[0]
+            cmd = f"cd {target_sub} && npm test"
+        # Root Node test discovery
         elif (self.workspace_root / "package.json").exists() and shutil.which("npm"):
             cmd = "npm test -- --run"
 
@@ -190,7 +208,17 @@ class TerminalVerificationRunner:
     def run_smoke_build(self, changed_files: List[ChangedFile]) -> Optional[VerificationOutcome]:
         """Executes a smoke build if a build step exists."""
         cmd = None
-        if (self.workspace_root / "package.json").exists() and shutil.which("npm"):
+        subdirs_with_pkg = {
+            Path(f.path).parts[0] for f in changed_files
+            if len(Path(f.path).parts) > 1 and (self.workspace_root / Path(f.path).parts[0] / "package.json").exists()
+        }
+
+        if subdirs_with_pkg and shutil.which("npm"):
+            target_sub = sorted(subdirs_with_pkg)[0]
+            pkg_content = (self.workspace_root / target_sub / "package.json").read_text(encoding="utf-8", errors="ignore")
+            if '"build":' in pkg_content:
+                cmd = f"cd {target_sub} && npm run build"
+        elif (self.workspace_root / "package.json").exists() and shutil.which("npm"):
             pkg_content = (self.workspace_root / "package.json").read_text(encoding="utf-8", errors="ignore")
             if '"build":' in pkg_content:
                 cmd = "npm run build"
