@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0.0",
+  "id": "spec-driven-development",
+  "version": "1.0.0",
+  "name": "Spec-Driven Development Workflow",
+  "description": "Declarative 8-stage Spec-Driven Development workflow mapping GitHub Spec Kit lifecycle to specialist Orchestra agents.",
+  "tier": "Normal",
+  "budget_profile": "Normal",
+  "steps": [
+    {
+      "id": "speckit_specify",
+      "name": "Define feature specification (what and why)",
+      "agent_role": "advisor",
+      "required_skills": ["speckit", "understand_anything"],
+      "dependencies": [],
+      "target_files": ["specs/spec.md"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_clarify",
+      "name": "Interrogate ambiguities and edge cases",
+      "agent_role": "advisor",
+      "required_skills": ["speckit"],
+      "dependencies": ["speckit_specify"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_plan",
+      "name": "Design technical architecture and contracts",
+      "agent_role": "advisor",
+      "required_skills": ["speckit", "archify"],
+      "dependencies": ["speckit_clarify"],
+      "target_files": ["specs/plan.md"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_checklist",
+      "name": "Verify acceptance criteria against constitution",
+      "agent_role": "reviewer",
+      "required_skills": ["speckit", "ponytail"],
+      "dependencies": ["speckit_plan"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_tasks",
+      "name": "Break down plan into dependency-ordered tasks",
+      "agent_role": "orchestra",
+      "required_skills": ["speckit"],
+      "dependencies": ["speckit_checklist"],
+      "target_files": ["specs/tasks.md"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_analyze",
+      "name": "Cross-artifact consistency and gap audit",
+      "agent_role": "reviewer",
+      "required_skills": ["speckit"],
+      "dependencies": ["speckit_tasks"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_implement",
+      "name": "Execute minimal implementation under TDD",
+      "agent_role": "orchestra",
+      "required_skills": ["superpowers", "ponytail"],
+      "dependencies": ["speckit_analyze"],
+      "verification_command": "true"
+    },
+    {
+      "id": "speckit_converge",
+      "name": "Final convergence and security sign-off",
+      "agent_role": "reviewer",
+      "required_skills": ["speckit", "ponytail"],
+      "dependencies": ["speckit_implement"],
+      "verification_command": "true"
+    }
+  ],
+  "acceptance_criteria": [
+    "Feature specification defined and clarified",
+    "Technical design plan and contracts verified",
+    "Checklist approved against constitutional constraints",
+    "Tasks decomposed with explicit dependencies",
+    "Cross-artifact consistency confirmed",
+    "Minimal implementation passing automated tests",
+    "Security review and final convergence signed off"
+  ]
+}

@@ -37,7 +37,8 @@ class SkillDiscovery:
                     if manifest_path.is_file():
                         try:
                             manifest = self.loader.load(manifest_path)
-                            skills[manifest.id] = manifest
+                            if manifest.id not in skills:
+                                skills[manifest.id] = manifest
                         except Exception as e:
                             # Log and skip invalid manifests
                             print(f"[SkillDiscovery] Warning: Failed to load {manifest_path}: {e}")

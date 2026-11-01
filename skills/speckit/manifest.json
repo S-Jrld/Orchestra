@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "id": "speckit",
+  "name": "GitHub Spec Kit",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "Spec-Driven Development (SDD) toolkit enforcing specification, clarification, technical planning, checklists, task decomposition, and consistency analysis before code execution.",
+  "source": {
+    "repo": "https://github.com/github/spec-kit.git",
+    "revision": "main",
+    "license": "MIT",
+    "upstream_author": "GitHub"
+  },
+  "triggers": {
+    "intents": [
+      "specification",
+      "spec-driven development",
+      "sdd",
+      "clarify requirements",
+      "technical planning",
+      "task breakdown"
+    ],
+    "keywords": [
+      "speckit",
+      "specify",
+      "spec",
+      "sdd",
+      "tasks.md",
+      "plan.md",
+      "spec.md"
+    ],
+    "command_triggers": [
+      "/speckit",
+      "/speckit.specify",
+      "/speckit.plan",
+      "/speckit.tasks",
+      "/speckit.analyze",
+      "/speckit.converge"
+    ]
+  },
+  "capabilities": [
+    "spec_driven_development",
+    "task_compilation",
+    "specification_linting",
+    "dag_generation"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 800,
+    "requires_network": false,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "low",
+    "read_only": false,
+    "requires_approval": false
+  }
+}

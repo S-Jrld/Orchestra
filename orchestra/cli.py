@@ -22,6 +22,7 @@ from orchestra.budget.profiles import BudgetProfileManager
 from orchestra.models import RunStatus, Tier, WorkflowDefinition, WorkflowStep
 from orchestra.registry import ManifestLoader, RoutingExplainer, SkillDiscovery, SkillResolver
 from orchestra.security.policy import SecurityPolicyEngine
+from orchestra.spec import SpecCompiler, SpecParser, SpecScaffold
 from orchestra.validator import SchemaValidator
 from orchestra.workflow.engine import WorkflowEngine
 from orchestra.workflow.state import RunStateManager
@@ -93,6 +94,24 @@ class OrchestraCLI:
         wf_run = wf_subs.add_parser("run", parents=[base_parser], help="Run workflow file")
         wf_run.add_argument("file", help="Workflow JSON path")
         wf_run.add_argument("--adapter", default="mock", choices=["mock", "opencode", "antigravity", "cursor", "claude"])
+
+        # spec
+        spec_parser = subparsers.add_parser("spec", parents=[base_parser], help="Spec-Driven Development (Spec Kit) operations")
+        spec_subs = spec_parser.add_subparsers(dest="spec_action")
+
+        spec_init = spec_subs.add_parser("init", parents=[base_parser], help="Scaffold a new feature specification")
+        spec_init.add_argument("feature_id", help="Feature ID (e.g. 001-auth or user-profile)")
+
+        spec_val = spec_subs.add_parser("validate", parents=[base_parser], help="Validate feature specification artifacts")
+        spec_val.add_argument("feature_id", help="Feature ID or path to feature directory")
+
+        spec_comp = spec_subs.add_parser("compile", parents=[base_parser], help="Compile tasks.md to an Orchestra DAG workflow")
+        spec_comp.add_argument("feature_id", help="Feature ID or path to feature directory")
+        spec_comp.add_argument("--output", "-o", help="Custom output JSON path")
+
+        spec_run = spec_subs.add_parser("run", parents=[base_parser], help="Compile and execute a feature specification DAG")
+        spec_run.add_argument("feature_id", help="Feature ID or path to feature directory")
+        spec_run.add_argument("--adapter", default="mock", choices=["mock", "opencode", "antigravity", "cursor", "claude"])
 
         # run
         run_parser = subparsers.add_parser("run", parents=[base_parser], help="Run inspection and recovery")
@@ -370,6 +389,102 @@ class OrchestraCLI:
                 print(f"✓ Workflow '{wf.name}' executed with status: {record.status.value}")
                 print(f"Run ID: {record.run_id}")
             return 0
+
+        return 0
+
+    def cmd_spec(self, args: argparse.Namespace) -> int:
+        action = getattr(args, "spec_action", "validate") or "validate"
+        specs_dir = self.workspace_root / "specs"
+
+        def _resolve_feature_dir(target: str) -> Path:
+            p = Path(target)
+            if p.is_dir():
+                return p.resolve()
+            candidate = specs_dir / target
+            if candidate.is_dir():
+                return candidate.resolve()
+            return candidate
+
+        if action == "init":
+            feat_dir = SpecScaffold.init_feature(specs_dir, args.feature_id)
+            if args.json:
+                self._output({"status": "created", "path": str(feat_dir)}, args)
+            else:
+                print(f"✓ Initialized feature specification in specs/{feat_dir.name}/")
+                print("  • spec.md      (Requirements & Boundaries)")
+                print("  • plan.md      (Technical Architecture & Contracts)")
+                print("  • tasks.md     (Dependency-Ordered Tasks)")
+                print("  • checklist.md (Readiness Checklist)")
+            return 0
+
+        elif action == "validate":
+            feat_dir = _resolve_feature_dir(args.feature_id)
+            issues = SpecScaffold.validate_feature(feat_dir)
+            if issues:
+                if args.json:
+                    self._output({"status": "invalid", "issues": issues}, args)
+                else:
+                    print(f"❌ Feature specification '{feat_dir.name}' has issues:\n- " + "\n- ".join(issues), file=sys.stderr)
+                return 1
+            if args.json:
+                self._output({"status": "valid", "feature": feat_dir.name}, args)
+            else:
+                print(f"✓ Feature specification '{feat_dir.name}' is complete and consistent.")
+            return 0
+
+        elif action == "compile":
+            feat_dir = _resolve_feature_dir(args.feature_id)
+            schema_path = self.workspace_root / "schemas" / "workflow-definition.json"
+            out_file = Path(args.output).resolve() if getattr(args, "output", None) else None
+            try:
+                wf, path = SpecCompiler.compile_feature(feat_dir, output_file=out_file, schema_path=schema_path)
+                if args.json:
+                    self._output({"status": "compiled", "workflow_id": wf.id, "path": str(path), "steps": len(wf.steps)}, args)
+                else:
+                    try:
+                        rel_path = path.relative_to(self.workspace_root)
+                    except ValueError:
+                        rel_path = path
+                    print(f"✓ Compiled {feat_dir.name}/tasks.md to {rel_path}")
+                    print(f"  • Workflow ID: {wf.id}")
+                    print(f"  • Steps: {len(wf.steps)}")
+                    print("  • DAG validation: cycle-free & schema compliant")
+                return 0
+            except Exception as e:
+                print(f"❌ Compilation failed: {e}", file=sys.stderr)
+                return 1
+
+        elif action == "run":
+            feat_dir = _resolve_feature_dir(args.feature_id)
+            schema_path = self.workspace_root / "schemas" / "workflow-definition.json"
+            try:
+                wf, path = SpecCompiler.compile_feature(feat_dir, schema_path=schema_path)
+            except Exception as e:
+                print(f"❌ Compilation failed before execution: {e}", file=sys.stderr)
+                return 1
+
+            adapter = MockAdapter()
+            if args.adapter == "opencode":
+                adapter = OpenCodeAdapter()
+            elif args.adapter == "antigravity":
+                adapter = AntigravityAdapter()
+            elif args.adapter == "cursor":
+                adapter = CursorAdapter()
+            elif args.adapter == "claude":
+                adapter = ClaudeCodeAdapter()
+
+            profile = BudgetProfileManager.get_profile(wf.tier.value)
+            b_mgr = BudgetManager(profile)
+            sec = SecurityPolicyEngine(self.workspace_root)
+            engine = WorkflowEngine(wf, adapter, self.state_manager, b_mgr, sec)
+
+            record = engine.run(task_description=wf.name)
+            if args.json:
+                self._output(record.__dict__, args)
+            else:
+                print(f"✓ Spec workflow '{wf.name}' executed with status: {record.status.value}")
+                print(f"Run ID: {record.run_id}")
+            return 0 if record.status == RunStatus.SUCCEEDED else 1
 
         return 0
 

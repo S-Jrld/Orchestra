@@ -48,8 +48,12 @@ class ClaudeCodeAdapter(ClientAdapter):
         for skill in skills:
             if not skill.path:
                 continue
-            src_dir = Path(skill.path)
-            dst_dir = dest_skills / skill.id
+            src_dir = Path(skill.path).resolve()
+            dst_dir = (dest_skills / skill.id).resolve()
+
+            if src_dir == dst_dir:
+                installed.append(skill.id)
+                continue
 
             if dst_dir.exists():
                 shutil.rmtree(dst_dir)

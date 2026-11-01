@@ -3,28 +3,30 @@
 > Current single-task truth. Overwrite when complete; keep under 30 lines.
 
 ## Goal
-Elevate Ponytail to ambient orchestration engine alongside Caveman for code minimalism and quality.
+Integrate GitHub Spec Kit into Orchestra: portable skill, declarative SDD workflow, Spec-to-DAG compiler, and CLI tooling.
 
 ## Classification
-- **Tier**: Normal
-- **Active Skill / Protocol**: [skills/ponytail.md](skills/ponytail.md) + [protocols/ENGINEERING_STANDARDS.md](protocols/ENGINEERING_STANDARDS.md)
-- **Activated Roles**: Orchestrator
+- **Tier**: Complex
+- **Active Skill / Protocol**: [protocols/ENGINEERING_STANDARDS.md](protocols/ENGINEERING_STANDARDS.md), [protocols/SUBAGENT_DISPATCH.md](protocols/SUBAGENT_DISPATCH.md)
+- **Activated Roles**: Lead Architect → Core Runtime Developer → QA Tester
 
 ## Scope & Target Files
-- `AGENTS.md`: Embedded constitutional `<!-- ponytail-begin -->` block & Smallest Complete Change Ladder
-- `ORCHESTRATOR.md`: Twin ambient engines (Caveman + Ponytail) & routing floor
-- `agents/orchestra.md`: Ponytail code floor in primary orchestrator responsibilities
-- `protocols/ENGINEERING_STANDARDS.md`: Section 2 Ponytail engine, ladder, and debt ledger
-- `protocols/TOKEN_ECONOMY.md`: Twin ambient engines (voice + code) & context hierarchy
-- `README.md` & `docs/context-economy.md`: Ambient code quality documentation
+- `skills/speckit/`: Skill manifest & token-dense markdown instructions
+- `workflows/spec-driven-development.json`: Declarative 8-stage SDD workflow
+- `orchestra/spec/`: Parser, validator, and DAG compiler
+- `orchestra/cli.py`: `orch spec {init,validate,compile,run}` commands
+- `tests/unit/test_spec_compiler.py`: Unit tests for parser, compiler, and CLI
+- `ORCHESTRATOR.md`: Route table update
+- `scripts/validate.sh`: Repository validation suite update
 
 ## Checklist
-- [x] 1. Embed Ponytail Smallest Complete Change Ladder into L0 `AGENTS.md` constitution
-- [x] 2. Declare Ponytail as session-ambient engine in `ORCHESTRATOR.md` alongside Caveman
-- [x] 3. Bind Ponytail code floor to `@orchestra` primary agent responsibilities
-- [x] 4. Update engineering standards and token economy protocols with Ponytail ladder
-- [x] 5. Document twin ambient engines across README and context economy docs
-- [x] 6. Validate repository structure, token bounds, and test suite green
+- [x] 1. Create portable `speckit` skill (`manifest.json`, `SKILL.md`, `skills/speckit.md`)
+- [x] 2. Create `workflows/spec-driven-development.json`
+- [x] 3. Implement `orchestra/spec/` (parser and compiler)
+- [x] 4. Add `orch spec` CLI commands
+- [x] 5. Write unit tests in `tests/unit/test_spec_compiler.py` (9/9 passed)
+- [x] 6. Update `ORCHESTRATOR.md` and `scripts/validate.sh`
+- [x] 7. Verify all suites pass (71/71 tests green, 100% validate.sh clean), create walkthrough
 
 ## Blockers & Open Decisions
-- None
+- None. Spec Kit fully integrated and verified.

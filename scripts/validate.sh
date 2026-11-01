@@ -25,6 +25,7 @@ REQUIRED_FILES=(
     "skills/archify.md"
     "skills/addy_osmani.md"
     "skills/ponytail.md"
+    "skills/speckit.md"
     "templates/ACTIVE_TASK.md"
     "templates/ADR_TEMPLATE.md"
     "templates/EXECUTION_BRIEF.md"

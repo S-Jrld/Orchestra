@@ -18,6 +18,7 @@
 | **Terse mode / less tokens** | [skills/caveman.md](skills/caveman.md) | Ambient | Caveman active, zero fluff, verbatim code |
 | **Typo, comment, formatting** | [protocols/ENGINEERING_STANDARDS.md](protocols/ENGINEERING_STANDARDS.md) | Tiny | Diff re-read clean, no scope creep |
 | **Feature, bugfix, logic change** | [skills/superpowers.md](skills/superpowers.md) | Normal | Red-Green TDD cycle complete, suite green |
+| **Spec-driven dev, SDD, spec/plan/tasks** | [skills/speckit.md](skills/speckit.md) | Normal | Spec & plan approved, tasks compiled to DAG |
 | **UI component, layout, styling** | [skills/impeccable.md](skills/impeccable.md) | Normal | Visual hierarchy verified, a11y baseline met |
 | **Design system, palette, style or font selection** | [skills/ui_ux_pro_max.md](skills/ui_ux_pro_max.md) | Normal | Verified search result: style + palette + font pairing reported |
 | **Codebase discovery, onboarding** | [skills/understand_anything.md](skills/understand_anything.md) | Normal | Key modules mapped, guided tour delivered |
@@ -34,7 +35,7 @@
 
 When a task matches multiple domains (e.g. Fullstack Feature = Superpowers + Impeccable + Archify):
 1. **Pipeline Order**:
-   `Discovery (Understand Anything / Graphify) → Design / ADR → Minimal Logic TDD (Superpowers / Ponytail) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
+   `Discovery (Understand Anything / Graphify) → Specification (Spec Kit) → Design / ADR → Minimal Logic TDD (Superpowers / Ponytail) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
 2. **Never Parallel-Load Skills**: Load exactly one task skill leaf at a time corresponding to active pipeline stage. Unload / return before advancing.
 3. **Ambient Engine Floors**:
    - [skills/caveman.md](skills/caveman.md) permanently active to minimize conversational token overhead.
