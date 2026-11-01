@@ -171,6 +171,21 @@ class OrchestraCLI:
             help="Minimum occurrences to generate rule suggestion",
         )
 
+        # pr
+        pr_p = subparsers.add_parser(
+            "pr",
+            parents=[base_parser],
+            help="Pull Request orchestration, pre-flight safety, verification, and evaluation",
+        )
+        pr_sub = pr_p.add_subparsers(dest="pr_action", help="PR action")
+        pr_rev = pr_sub.add_parser("review", parents=[base_parser], help="Ingest, verify, evaluate, and review a PR")
+        pr_rev.add_argument("pr_identifier", help="PR number, branch name, or GitHub PR URL")
+        pr_rev.add_argument("--no-checkout", action="store_true", help="Evaluate diff without local branch checkout")
+        pr_rev.add_argument("--skip-tests", action="store_true", help="Skip terminal test suite execution")
+        pr_rev.add_argument("--dry-run", action="store_true", help="Simulate execution without modifying workspace")
+        pr_rev.add_argument("--publish", action="store_true", help="Prompt to publish review via gh pr review")
+        pr_rev.add_argument("--output", help="Save markdown review artifact to specific path")
+
         args = parser.parse_args(argv)
         if not args.subcommand:
             parser.print_help()
@@ -741,6 +756,122 @@ class OrchestraCLI:
                 print(f"    Recommendation: {sugg['recommendation']}")
 
         return 0
+
+    def cmd_pr(self, args: argparse.Namespace) -> int:
+        action = getattr(args, "pr_action", "review") or "review"
+        if action != "review":
+            print(f"Unknown PR action '{action}'. Supported actions: review")
+            return 1
+
+        from orchestra.pr import (
+            DependencyGraphTracer,
+            MultiDimensionalEvaluator,
+            PRIngestionPipeline,
+            ReviewSynthesizer,
+            TerminalVerificationRunner,
+            WorkspaceSafetyWrapper,
+        )
+
+        pr_id = getattr(args, "pr_identifier", None)
+        if not pr_id:
+            print("Error: PR identifier (number, branch, or URL) required.")
+            return 1
+
+        safety = WorkspaceSafetyWrapper(self.workspace_root)
+        ingestion = PRIngestionPipeline(self.workspace_root)
+        dep_tracer = DependencyGraphTracer(self.workspace_root)
+        runner = TerminalVerificationRunner(self.workspace_root)
+        evaluator = MultiDimensionalEvaluator(self.workspace_root)
+        synthesizer = ReviewSynthesizer(self.workspace_root)
+
+        print(f"🎻 Orchestra PR Orchestration: Reviewing PR #{pr_id}...")
+
+        no_checkout = getattr(args, "no_checkout", False)
+        dry_run = getattr(args, "dry_run", False)
+
+        # 1. Pre-flight safety snapshot
+        if not no_checkout and not dry_run:
+            print("→ [Safety] Capturing workspace snapshot and dirty stashing...")
+            try:
+                safety.capture_snapshot()
+            except Exception as e:
+                print(f"Pre-flight safety check failed: {e}")
+                return 1
+
+        try:
+            # 2. Fetch metadata & checkout
+            print(f"→ [Ingestion] Fetching PR #{pr_id} metadata and diff...")
+            metadata = ingestion.fetch_metadata(pr_id)
+            if not no_checkout and not dry_run:
+                print(f"→ [Ingestion] Checking out PR branch '{metadata.head_ref}'...")
+                ingestion.checkout_pr(pr_id)
+
+            changed_files = ingestion.fetch_diff(pr_id, metadata)
+            active_files = [f for f in changed_files if not f.is_filtered]
+            print(f"→ [Triage] {len(changed_files)} files changed ({len(active_files)} evaluated, {len(changed_files) - len(active_files)} noise filtered).")
+
+            # 3. Dependency Impact Tracing
+            print("→ [Dependencies] Tracing upstream and downstream module impacts...")
+            impacted = dep_tracer.trace_impact(changed_files)
+
+            # 4. Terminal Verification
+            outcomes = []
+            if not getattr(args, "skip_tests", False) and not no_checkout and not dry_run:
+                print("→ [Verification] Executing deterministic static analysis and tests...")
+                outcomes = runner.run_all(changed_files, skip_tests=getattr(args, "skip_tests", False))
+                for out in outcomes:
+                    status_str = "PASSED" if out.passed else "FAILED"
+                    print(f"   • {out.step_name}: {status_str} (exit {out.exit_code}) in {out.duration_seconds}s")
+            else:
+                print("→ [Verification] Test execution skipped.")
+
+            # 5. Multi-Dimensional Evaluation
+            print("→ [Evaluation] Auditing diff against 7 software engineering standards...")
+            findings = evaluator.evaluate(metadata, changed_files, outcomes)
+            print(f"→ [Findings] Generated {len(findings)} review findings.")
+
+            # 6. Synthesis & Report Generation
+            report = synthesizer.build_report(metadata, outcomes, findings, impacted)
+            out_dir = Path(args.output).parent if getattr(args, "output", None) else None
+            report_path = synthesizer.save_report(report, output_dir=out_dir)
+            print(f"✓ Review report generated: {report_path}")
+
+            if getattr(args, "json", False):
+                import dataclasses
+
+                def to_dict(obj):
+                    if dataclasses.is_dataclass(obj):
+                        return {k: to_dict(v) for k, v in dataclasses.asdict(obj).items()}
+                    elif isinstance(obj, list):
+                        return [to_dict(i) for i in obj]
+                    elif isinstance(obj, dict):
+                        return {k: to_dict(v) for k, v in obj.items()}
+                    return str(obj.value) if hasattr(obj, "value") else obj
+
+                self._output(to_dict(report), args)
+            else:
+                md = synthesizer.render_markdown(report)
+                print("\n" + "=" * 60 + "\n" + md + "\n" + "=" * 60 + "\n")
+
+            # 7. Publishing Gate
+            if getattr(args, "publish", False):
+                print(f"Recommendation: {report.verdict.value}")
+                confirm = input("Publish this review to GitHub via 'gh pr review'? [y/N]: ").strip().lower()
+                if confirm == "y":
+                    ok = synthesizer.publish_review(report)
+                    print(f"Review published: {'SUCCESS' if ok else 'FAILED'}")
+                else:
+                    print("Publishing cancelled by user.")
+
+            return 0
+        finally:
+            if not no_checkout and not dry_run:
+                print("→ [Cleanup] Restoring workspace to pre-flight snapshot...")
+                try:
+                    safety.restore()
+                    print("✓ Workspace cleanly restored.")
+                except Exception as e:
+                    print(f"Warning: Restoration error: {e}")
 
     def cmd_validate(self, args: argparse.Namespace) -> int:
         # Run repository validation

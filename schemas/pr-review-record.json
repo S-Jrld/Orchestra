@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orchestra.dev/schemas/pr-review-record.json",
+  "title": "OrchestraPRReviewRecord",
+  "description": "Structured completion evidence and multi-pass evaluation for PR reviews.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "pr_number",
+    "pr_title",
+    "author",
+    "base_ref",
+    "head_ref",
+    "verdict",
+    "executive_summary",
+    "verification_outcomes",
+    "findings"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "pr_number": {
+      "type": "integer"
+    },
+    "pr_title": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "base_ref": {
+      "type": "string"
+    },
+    "head_ref": {
+      "type": "string"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["APPROVE", "REQUEST_CHANGES", "COMMENT"]
+    },
+    "executive_summary": {
+      "type": "string"
+    },
+    "verification_outcomes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_name", "command", "exit_code", "passed"],
+        "properties": {
+          "step_name": { "type": "string" },
+          "command": { "type": "string" },
+          "exit_code": { "type": "integer" },
+          "output_snippet": { "type": "string" },
+          "duration_seconds": { "type": "number" },
+          "passed": { "type": "boolean" },
+          "error_diagnostics": {
+            "type": "array",
+            "items": { "type": "object" }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "severity",
+          "path",
+          "start_line",
+          "end_line",
+          "principle_rationale",
+          "merge_impact"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["Blocker", "Major", "Minor", "Nit", "Praise"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["Critical", "High", "Medium", "Low", "Info"]
+          },
+          "path": { "type": "string" },
+          "start_line": { "type": "integer" },
+          "end_line": { "type": "integer" },
+          "principle_rationale": { "type": "string" },
+          "suggested_diff": { "type": ["string", "null"] },
+          "merge_impact": {
+            "type": "string",
+            "enum": ["Blocks merge", "Non-blocking"]
+          }
+        }
+      }
+    },
+    "impacted_dependencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

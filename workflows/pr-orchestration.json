@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "id": "pr-orchestration",
+  "version": "1.0.0",
+  "name": "Local Pull Request Orchestration Workflow",
+  "description": "Fail-safe PR checkout, terminal verification, multi-pass code evaluation, and human-gated review publishing.",
+  "tier": "Normal",
+  "budget_profile": "Normal",
+  "steps": [
+    {
+      "id": "preflight_safety",
+      "name": "Pre-flight workspace snapshot and dirty stashing",
+      "agent_role": "orchestra",
+      "dependencies": [],
+      "verification_command": "git status --porcelain"
+    },
+    {
+      "id": "ingest_checkout",
+      "name": "Fetch PR metadata, checkout branch, and filter noise",
+      "agent_role": "researcher",
+      "dependencies": ["preflight_safety"],
+      "verification_command": "true"
+    },
+    {
+      "id": "trace_dependencies",
+      "name": "Trace impacted upstream and downstream modules",
+      "agent_role": "researcher",
+      "dependencies": ["ingest_checkout"],
+      "verification_command": "true"
+    },
+    {
+      "id": "terminal_verification",
+      "name": "Execute static analysis, linters, tests, and smoke build",
+      "agent_role": "tester",
+      "dependencies": ["trace_dependencies"],
+      "verification_command": "true"
+    },
+    {
+      "id": "multidimensional_eval",
+      "name": "Multi-pass code evaluation against 7 standards",
+      "agent_role": "reviewer",
+      "dependencies": ["terminal_verification"],
+      "verification_command": "true"
+    },
+    {
+      "id": "synthesize_and_cleanup",
+      "name": "Synthesize review report, prompt user, and restore workspace",
+      "agent_role": "orchestra",
+      "dependencies": ["multidimensional_eval"],
+      "verification_command": "true"
+    }
+  ],
+  "acceptance_criteria": [
+    "Pre-flight snapshot recorded and dirty state stashed",
+    "PR branch checked out without untracked file loss",
+    "Lockfiles and minified assets filtered from review",
+    "Terminal verification executed and exit codes triaged",
+    "Code evaluated across 7 software engineering standards",
+    "Findings categorized using Conventional Comments syntax",
+    "Review artifact persisted and workspace cleanly restored"
+  ]
+}
