@@ -22,6 +22,7 @@
 | **UI component, layout, styling** | [skills/impeccable.md](skills/impeccable.md) | Normal | Visual hierarchy verified, a11y baseline met |
 | **Design system, palette, style or font selection** | [skills/ui_ux_pro_max.md](skills/ui_ux_pro_max.md) | Normal | Verified search result: style + palette + font pairing reported |
 | **Codebase discovery, onboarding** | [skills/understand_anything.md](skills/understand_anything.md) | Normal | Key modules mapped, guided tour delivered |
+| **External research, social/media, web search** | [skills/agent_reach.md](skills/agent_reach.md) | Normal | Findings verified across channels, source attributed |
 | **Deep dependency & structure graph**| [skills/graphify.md](skills/graphify.md) | Normal | Knowledge graph built, god-nodes reported |
 | **System diagrams & C4 models** | [skills/archify.md](skills/archify.md) | Normal | Mermaid / SVG diagram validated & rendered |
 | **Performance, bundle, latency fix**| [skills/addy_osmani.md](skills/addy_osmani.md) | Normal–Complex | Metrics measured before AND after; no speculative cache |
@@ -35,7 +36,7 @@
 
 When a task matches multiple domains (e.g. Fullstack Feature = Superpowers + Impeccable + Archify):
 1. **Pipeline Order**:
-   `Discovery (Understand Anything / Graphify) → Specification (Spec Kit) → Design / ADR → Minimal Logic TDD (Superpowers / Ponytail) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
+   `Discovery (Understand Anything / Graphify / Agent-Reach) → Specification (Spec Kit) → Design / ADR → Minimal Logic TDD (Superpowers / Ponytail) → Design System (UI/UX Pro Max) → UI Polish (Impeccable) → Diagram (Archify) → Delivery`
 2. **Never Parallel-Load Skills**: Load exactly one task skill leaf at a time corresponding to active pipeline stage. Unload / return before advancing.
 3. **Ambient Engine Floors**:
    - [skills/caveman.md](skills/caveman.md) permanently active to minimize conversational token overhead.

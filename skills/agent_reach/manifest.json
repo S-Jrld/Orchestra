@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "id": "agent_reach",
+  "name": "Agent-Reach Intelligence Layer",
+  "version": "1.0.0",
+  "kind": "task-leaf",
+  "summary": "External internet, social media, and multimedia reach layer giving agents access to Twitter, Reddit, YouTube, GitHub, Bilibili, and web search without paid API keys.",
+  "source": {
+    "repo": "https://github.com/Panniantong/Agent-Reach.git",
+    "revision": "main",
+    "license": "MIT",
+    "upstream_author": "Panniantong"
+  },
+  "triggers": {
+    "intents": [
+      "external research",
+      "web search",
+      "social media search",
+      "video transcript",
+      "community discussions",
+      "reddit search",
+      "twitter search",
+      "youtube search"
+    ],
+    "keywords": [
+      "agent-reach",
+      "reach",
+      "twitter",
+      "x.com",
+      "reddit",
+      "youtube",
+      "bilibili",
+      "xiaohongshu",
+      "v2ex",
+      "jina",
+      "video transcript"
+    ],
+    "command_triggers": [
+      "/agent-reach",
+      "/reach",
+      "/reach.doctor"
+    ]
+  },
+  "capabilities": [
+    "web_scraping",
+    "social_search",
+    "video_transcript_extraction",
+    "multimedia_intelligence"
+  ],
+  "dependencies": [],
+  "conflicts": [],
+  "resources": {
+    "instruction_file": "SKILL.md"
+  },
+  "compatibility": {
+    "opencode": true,
+    "antigravity": true
+  },
+  "execution": {
+    "tier": "Normal",
+    "estimated_tokens": 850,
+    "requires_network": true,
+    "requires_shell": true
+  },
+  "security": {
+    "risk_level": "medium",
+    "read_only": true,
+    "requires_approval": false
+  }
+}

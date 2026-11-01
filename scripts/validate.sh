@@ -26,6 +26,7 @@ REQUIRED_FILES=(
     "skills/addy_osmani.md"
     "skills/ponytail.md"
     "skills/speckit.md"
+    "skills/agent_reach.md"
     "templates/ACTIVE_TASK.md"
     "templates/ADR_TEMPLATE.md"
     "templates/EXECUTION_BRIEF.md"

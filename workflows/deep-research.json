@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "id": "deep-research",
+  "version": "1.0.0",
+  "name": "Deep External Research Workflow",
+  "description": "Coordinated intelligence workflow combining Agent-Reach external multi-channel search with codebase discovery and architectural synthesis.",
+  "tier": "Normal",
+  "budget_profile": "Normal",
+  "steps": [
+    {
+      "id": "gather_intelligence",
+      "name": "Query external platforms and extract findings",
+      "agent_role": "researcher",
+      "required_skills": ["agent_reach", "understand_anything"],
+      "dependencies": [],
+      "verification_command": "true"
+    },
+    {
+      "id": "synthesize_findings",
+      "name": "Synthesize intelligence into architectural options",
+      "agent_role": "advisor",
+      "required_skills": ["agent_reach"],
+      "dependencies": ["gather_intelligence"],
+      "verification_command": "true"
+    },
+    {
+      "id": "audit_facts",
+      "name": "Audit source citations and technical accuracy",
+      "agent_role": "reviewer",
+      "required_skills": ["ponytail"],
+      "dependencies": ["synthesize_findings"],
+      "verification_command": "true"
+    }
+  ],
+  "acceptance_criteria": [
+    "External intelligence gathered across verified channels",
+    "Findings synthesized with explicit source attribution",
+    "Technical accuracy and claims audited"
+  ]
+}
